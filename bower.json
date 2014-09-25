@@ -1,0 +1,8 @@
+{
+  "name": "crabpy_dojo",
+  "version": "1.0.0",
+  "main": "CrabpyWidget.js",
+  "ignore": [
+    "test"
+  ]
+}

@@ -4,5 +4,8 @@
   "main": "CrabpyWidget.js",
   "ignore": [
     "test"
-  ]
+  ],
+  "dependencies": {
+    "dojo-form-controls": "https://github.com/sirprize/dojo-form-controls"
+  }
 }

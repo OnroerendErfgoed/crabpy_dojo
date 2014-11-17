@@ -76,7 +76,10 @@ define([
                 }
 
                 request(self.baseUrl + "/crab/provincies/" + value + "/gemeenten", {
-                    handleAs: "json"
+                    handleAs: "json",
+                    headers: {
+                        "X-Requested-With": ""
+                    }
                 }).then(function (jsondata) {
                         if (self.sortMethod) {
                             jsondata.sort(self.sortMethod);
@@ -103,7 +106,10 @@ define([
                 streetSelector.reset();
                 numberSelector.reset();
                 request(self.baseUrl + "/crab/gemeenten/" + value + "/straten?aantal=5000", {
-                    handleAs: "json"
+                    handleAs: "json",
+                    headers: {
+                        "X-Requested-With": ""
+                    }
                 }).then(function (jsondata) {
                         if (self.sortMethod) {
                             jsondata.sort(self.sortMethod);
@@ -128,7 +134,10 @@ define([
                 numberSelector.set('disabled', true);
                 numberSelector.reset();
                 request(self.baseUrl + "/crab/straten/" + value + "/huisnummers?aantal=5000", {
-                    handleAs: "json"
+                    handleAs: "json",
+                    headers: {
+                        "X-Requested-With": ""
+                    }
                 }).then(function (jsondata) {
                         if (self.sortMethod) {
                             jsondata.sort(self.sortMethod);
@@ -151,7 +160,10 @@ define([
 
             if (this.provinceList == null) {
                 request(this.baseUrl + "/crab/gewesten/2/provincies", {
-                    handleAs: "json"
+                    handleAs: "json",
+                    headers: {
+                        "X-Requested-With": ""
+                    }
                 }).then(
                     function (jsondata) {
                         if (self.sortMethod) {
@@ -168,7 +180,10 @@ define([
 
             if (this.municipalityList == null) {
                 request(this.baseUrl + "/crab/gewesten/2/gemeenten?aantal=500", {
-                    handleAs: "json"
+                    handleAs: "json",
+                    headers: {
+                        "X-Requested-With": ""
+                    }
                 }).then(
                     function (jsondata) {
                         if (self.sortMethod) {

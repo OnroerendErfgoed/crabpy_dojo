@@ -1,11 +1,11 @@
 define([
-    "dijit/_WidgetBase",
-    "dijit/_TemplatedMixin",
+    "mijit/_WidgetBase",
+    "mijit/_TemplatedMixin",
     "dojo/_base/declare",
+    "dojo/_base/array",
     "dojo/request",
-    "dijit/form/FilteringSelect",
-    "dojo/store/Memory"
-], function (_WidgetBase, _TemplatedMixin, declare, request, FilteringSelect, Memory) {
+    "dojo-form-controls/Select"
+], function (_WidgetBase, _TemplatedMixin, declare, array, request, Select) {
 
     return declare([_WidgetBase, _TemplatedMixin], {
 
@@ -14,7 +14,6 @@ define([
             '   <fieldset>' +
             '       <div data-dojo-attach-point="provinceSelect"></div>' +
             '       <div data-dojo-attach-point="municipalitySelect"></div>' +
-            '       <!--<div data-dojo-attach-point="deelgemeenteSelect"></div>-->' +
             '       <div data-dojo-attach-point="streetSelect"></div>' +
             '       <div data-dojo-attach-point="numberSelect"></div>' +
             '   </fieldset>' +
@@ -37,20 +36,24 @@ define([
 
             this.sortMethod = this._sortNatural;
 
-            var provinceSelector = this._buildFilteringSelect("niscode", "naam", "Kies een provincie", this.provinceSelect);
+            var provinceSelector = this._buildSelect("provinceSelector", "niscode", "naam", "Kies een provincie",
+                this.provinceSelect);
             if (this.provinceList){
-                provinceSelector.store.setData(this.provinceList);
+                this._setSelectOptions(provinceSelector, this.provinceList);
                 provinceSelector.set('disabled', this.disabled);
             }
 
-            var municipalitySelector = this._buildFilteringSelect("id", "naam", "Kies een gemeente", this.municipalitySelect);
+            var municipalitySelector = this._buildSelect("municipalitySelector", "id", "naam", "Kies een gemeente",
+                this.municipalitySelect);
             if (this.municipalityList){
-                municipalitySelector.store.setData(this.municipalityList);
+                this._setSelectOptions(municipalitySelector, this.municipalityList);
                 municipalitySelector.set('disabled', this.disabled);
             }
 
-            var streetSelector = this._buildFilteringSelect("id", "label", "Kies een straat", this.streetSelect);
-            var numberSelector = this._buildFilteringSelect("id", "label", "Kies een huisnummer", this.numberSelect);
+            var streetSelector = this._buildSelect("streetSelector", "id", "label", "Kies een straat",
+                this.streetSelect);
+            var numberSelector = this._buildSelect("numberSelector", "id", "label", "Kies een huisnummer",
+                this.numberSelect);
 
             this.provinceSelector = provinceSelector;
             this.municipalitySelector = municipalitySelector;
@@ -65,11 +68,11 @@ define([
                 municipalitySelector.set('disabled', true);
                 streetSelector.set('disabled', true);
                 numberSelector.set('disabled', true);
-                municipalitySelector.reset();
-                streetSelector.reset();
-                numberSelector.reset();
+                municipalitySelector.set('value', '');
+                streetSelector.set('value', '');
+                numberSelector.set('value', '');
                 if (!value) {
-                    municipalitySelector.store.setData(self.municipalityList);
+                    self._setSelectOptions(municipalitySelector, self.municipalityList);
                     provinceSelector.set('disabled', false);
                     municipalitySelector.set('disabled', false);
                     return false;
@@ -84,7 +87,7 @@ define([
                         if (self.sortMethod) {
                             jsondata.sort(self.sortMethod);
                         }
-                        municipalitySelector.store.setData(jsondata);
+                        self._setSelectOptions(municipalitySelector, jsondata);
                         provinceSelector.set('disabled', false);
                         municipalitySelector.set('disabled', false);
                         if (location && location.municipality && location.province && location.province.id == value) {
@@ -103,8 +106,8 @@ define([
                 municipalitySelector.set('disabled', true);
                 streetSelector.set('disabled', true);
                 numberSelector.set('disabled', true);
-                streetSelector.reset();
-                numberSelector.reset();
+                streetSelector.set('value', '');
+                numberSelector.set('value', '');
                 request(self.baseUrl + "/crab/gemeenten/" + value + "/straten?aantal=5000", {
                     handleAs: "json",
                     headers: {
@@ -114,7 +117,7 @@ define([
                         if (self.sortMethod) {
                             jsondata.sort(self.sortMethod);
                         }
-                        streetSelector.store.setData(jsondata);
+                        self._setSelectOptions(streetSelector, jsondata);
                         provinceSelector.set('disabled', false);
                         municipalitySelector.set('disabled', false);
                         streetSelector.set('disabled', false);
@@ -132,7 +135,7 @@ define([
                 var location = self.value;
                 streetSelector.set('disabled', true);
                 numberSelector.set('disabled', true);
-                numberSelector.reset();
+                numberSelector.set('value', '');
                 request(self.baseUrl + "/crab/straten/" + value + "/huisnummers?aantal=5000", {
                     handleAs: "json",
                     headers: {
@@ -142,7 +145,7 @@ define([
                         if (self.sortMethod) {
                             jsondata.sort(self.sortMethod);
                         }
-                        numberSelector.store.setData(jsondata);
+                        self._setSelectOptions(numberSelector, jsondata);
                         streetSelector.set('disabled', false);
                         numberSelector.set('disabled', false);
                         if (location && location.housenumber && location.street && location.street.id == value) {
@@ -169,7 +172,7 @@ define([
                         if (self.sortMethod) {
                             jsondata.sort(self.sortMethod);
                         }
-                        provinceSelector.store.setData(jsondata);
+                        self._setSelectOptions(provinceSelector, jsondata);
                         provinceSelector.set('disabled', false);
                         self.provinceList  = jsondata;
                     },
@@ -190,7 +193,7 @@ define([
                             jsondata.sort(self.sortMethod);
                         }
                         self.municipalityCache = jsondata;
-                        municipalitySelector.store.setData(jsondata);
+                        self._setSelectOptions(municipalitySelector, jsondata);
                         municipalitySelector.set('disabled', false);
                         self.municipalityList = jsondata;
                     },
@@ -211,21 +214,41 @@ define([
             this.municipalitySelector.set('disabled', !this.disabled);
         },
 
-        _buildFilteringSelect: function (idfield, labelfield, placeholder, node) {
-            return new FilteringSelect({
-                store: new Memory({idProperty: idfield, data: []}),
-                placeholder: placeholder,
-                labelAttr: labelfield,
-                searchAttr: labelfield,
-                required: false,
-                naturalSortAttribute: labelfield,
-                fetchProperties: {
-                   // sort:[{attribute:labelfield, descending:false}]
-                },
-                disabled: true,
-                autoComplete: false,
-                maxHeight:300
+        _buildSelect: function (name, idfield, labelfield, placeholder, node) {
+            var defaultOption = [
+                { value: '', label: placeholder}
+            ];
+            return new Select({
+                name: name,
+                idfield: idfield,
+                labelfield: labelfield,
+                value: '',
+                options: defaultOption,
+                required: false
             }, node);
+        },
+
+        _setSelectOptions: function (select, jsondata) {
+            var defaultOption = [select.get('options')[0]];
+            var options = array.map(jsondata, function(object){
+                var returnObject = {};
+                returnObject.value = object[select.idfield].toString();
+                returnObject.label = object[select.labelfield];
+                return returnObject;
+            });
+            select.set('options', defaultOption.concat(options));
+        },
+
+        _getSelectValue: function (selector) {
+            var value = selector.get('value');
+            var label = value;
+            array.some(selector.get('options'), function (option) {
+                if (option.value == value) {
+                    label = option.label;
+                    return false;
+                }
+            });
+            return {id: value, name: label};
         },
 
         _errorHandler: function (e){
@@ -235,14 +258,14 @@ define([
         },
 
         reset: function () {
-            this.municipalitySelector.store.setData(this.municipalityList);
-            this.streetSelector.store.setData([]);
-            this.numberSelector.store.setData([]);
+            this._setSelectOptions(this.municipalitySelector, this.municipalityList);
+            this._setSelectOptions(this.streetSelector, []);
+            this._setSelectOptions(this.numberSelector, []);
 
-            this.provinceSelector.reset();
-            this.municipalitySelector.reset();
-            this.streetSelector.reset();
-            this.numberSelector.reset();
+            this.provinceSelector.set('value', '');
+            this.municipalitySelector.set('value', '');
+            this.streetSelector.set('value', '');
+            this.numberSelector.set('value', '');
 
             this.provinceSelector.set('disabled', false);
             this.municipalitySelector.set('disabled', false);
@@ -254,38 +277,19 @@ define([
             var address = {};
 
             if (this.provinceSelector.get('value')) {
-                address.province = {
-                    id: this.provinceSelector.get('value'),
-                    name: this.provinceSelector.get('displayedValue')
-                };
+                address.province = this._getSelectValue(this.provinceSelector);
             }
 
             if (this.municipalitySelector.get('value')) {
-                address.municipality = {
-                    id: this.municipalitySelector.get('value'),
-                    name: this.municipalitySelector.get('displayedValue')
-                };
+                address.municipality = this._getSelectValue(this.municipalitySelector);
             }
 
-//            if (this.deelgemeenteSelector.get('value')) {
-//                address.deelgemeente = {
-//                    id: this.deelgemeenteSelector.get('value'),
-//                    name: this.deelgemeenteSelector.get('displayedValue')
-//                };
-//            }
-
             if (this.streetSelector.get('value')) {
-                address.street = {
-                    id: this.streetSelector.get('value'),
-                    name: this.streetSelector.get('displayedValue')
-                };
+                address.street = this._getSelectValue(this.streetSelector);
             }
 
             if (this.numberSelector.get('value')) {
-                address.housenumber = {
-                    id: this.numberSelector.get('value'),
-                    name: this.numberSelector.get('displayedValue')
-                };
+                address.housenumber = this._getSelectValue(this.numberSelector);
             }
 
             return address;

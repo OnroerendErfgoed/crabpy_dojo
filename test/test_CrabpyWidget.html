@@ -3,13 +3,14 @@
 <head>
     <meta charset="utf-8">
     <title>Tutorial: Hello Dojo!</title>
-    <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/dojo/1.10.1/dojo/resources/dojo.css">
-    <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/dojo/1.10.1/dijit/themes/nihilo/nihilo.css" media="screen">
+    <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/dojo/1.10.2/dojo/resources/dojo.css">
 </head>
-<body class="nihilo">
+<body>
     <div id="widgetContainer">
         <div id="widgetNode"></div>
         <button id="testButtonNode" type="button"></button>
+        <button id="test2ButtonNode" type="button"></button>
+        <button id="test3ButtonNode" type="button"></button>
         <div id="testResult">-</div>
     </div>
 
@@ -17,10 +18,20 @@
     <script type="text/javascript">
         var dojoConfig = {
             async: true,
-            packages: [{
+            packages: [
+                {
                 name: 'src',
                 location: location.pathname.replace(/[^\/]+$/, '') + '../'
-            }]
+                },
+                {
+                    name: 'dojo-form-controls',
+                    location: location.pathname.replace(/[^\/]+$/, '') + '../bower_components/dojo-form-controls'
+                },
+                {
+                    name: "mijit",
+                    location: location.pathname.replace(/[^\/]+$/, '') + "../bower_components/mijit"
+                }
+            ]
         };
     </script>
     <script src="//ajax.googleapis.com/ajax/libs/dojo/1.10.1/dojo/dojo.js"
@@ -29,7 +40,7 @@
     <script>
         require([
             "src/CrabpyWidget",
-            "dijit/form/Button",
+            "dojo-form-controls/Button",
             "dojo/dom",
             "dojo/json"
         ], function (CrabpyWidget, Button, dom, JSON) {
@@ -47,6 +58,23 @@
                     dom.byId("testResult").innerHTML = JSON.stringify(widgetUnderTest.get('value'));
                 }
             }, "testButtonNode").startup();
+
+            var myButton2 = new Button({
+                label: "Set value",
+                onClick: function(){
+                    widgetUnderTest.set('value', {"province":{"id":"10000","name":"Antwerpen"},"municipality":{"id":"44","name":"Arendonk"},"street":{"id":"12417","name":"Aartrijtstraat"},"housenumber":{"id":"537126","name":"6"}});
+//                    widgetUnderTest.set('value', {"municipality":{"id":"44","name":"Arendonk"},"street":{"id":"12417","name":"Aartrijtstraat"},"housenumber":{"id":"537126","name":"6"}});
+//                    widgetUnderTest.set('value', {"province":{"id":"10000","name":"Antwerpen"}});
+                }
+            }, "test2ButtonNode").startup();
+
+            var myButton3 = new Button({
+                label: "reset",
+                onClick: function(){
+                    widgetUnderTest.reset();
+                    dom.byId("testResult").innerHTML = JSON.stringify(widgetUnderTest.get('value'));
+                }
+            }, "test3ButtonNode").startup();
         });
     </script>
 </body>

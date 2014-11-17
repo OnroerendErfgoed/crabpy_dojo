@@ -6,6 +6,7 @@
     "test"
   ],
   "dependencies": {
-    "dojo-form-controls": "https://github.com/sirprize/dojo-form-controls"
+    "dojo-form-controls": "https://github.com/sirprize/dojo-form-controls.git",
+    "mijit": "git://github.com/sirprize/mijit.git#~1.8.1"
   }
 }

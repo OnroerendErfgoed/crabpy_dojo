@@ -25,7 +25,8 @@ define([
             return new CrabZoomer({
                 name: "crabzoomer",
                 baseUrl: this.baseUrl,
-                baseClass: this.baseClass
+                baseClass: this.baseClass,
+                sortMethod: this._sortNatural
             }, node);
         },
 

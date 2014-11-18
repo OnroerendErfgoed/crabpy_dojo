@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Tutorial: Hello Dojo!</title>
+    <title>Test crabpy widget</title>
 </head>
 <body>
     <div id="widgetContainer">
@@ -10,7 +10,9 @@
         <button id="testButtonNode" type="button"></button>
         <button id="test2ButtonNode" type="button"></button>
         <button id="test3ButtonNode" type="button"></button>
+        <button id="test4ButtonNode" type="button"></button>
         <div id="testResult">-</div>
+        <div id="bboxResult">-</div>
     </div>
 
     <!-- load Dojo -->
@@ -72,8 +74,16 @@
                 onClick: function(){
                     widgetUnderTest.reset();
                     dom.byId("testResult").innerHTML = JSON.stringify(widgetUnderTest.get('value'));
+                    dom.byId("bboxResult").innerHTML = JSON.stringify(widgetUnderTest.getBbox());
                 }
             }, "test3ButtonNode").startup();
+
+            var myButton4 = new Button({
+                label: "get bbox",
+                onClick: function(){
+                    dom.byId("bboxResult").innerHTML = widgetUnderTest.getBbox();
+                }
+            }, "test4ButtonNode").startup();
         });
     </script>
 </body>

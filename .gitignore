@@ -1,2 +1,5 @@
 # IDE stuff:
 .idea
+
+# js libraries:
+bower_components

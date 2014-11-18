@@ -305,6 +305,37 @@ define([
             }
         },
 
+        getBbox: function () {
+            var bbox = null;
+            var url = null;
+
+            if (this.numberSelector.get('value')) {
+                url = this.baseUrl + "/crab/huisnummers/" + this.numberSelector.get('value');
+            }
+            else if (this.streetSelector.get('value')) {
+                url = this.baseUrl + "/crab/straten/" + this.streetSelector.get('value');
+            }
+            else if (this.municipalitySelector.get('value')) {
+                url = this.baseUrl + "/crab/gemeenten/" + this.municipalitySelector.get('value');
+            }
+            if (url) {
+                request(url, {
+                    handleAs: "json",
+                    sync: true,
+                    headers: {
+                        "X-Requested-With": ""
+                    }
+                }).then(function (jsondata) {
+                    console.log(jsondata.bounding_box);
+                    bbox = jsondata.bounding_box;
+                },
+                function (error) {
+                    console.log("An error occurred: " + error);
+                });
+            }
+            return bbox;
+        },
+
         _sortNatural: function (a, b) {
             function chunkify(t) {
                 var tz = [], x = 0, y = -1, n = 0, i, j;

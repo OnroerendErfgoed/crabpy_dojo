@@ -13,6 +13,14 @@
         <button id="test4ButtonNode" type="button"></button>
         <div id="testResult">-</div>
         <div id="bboxResult">-</div>
+        <hr>
+        <div id="widgetNodeB"></div>
+        <button id="testBButtonNode" type="button"></button>
+        <button id="testB2ButtonNode" type="button"></button>
+        <button id="testB3ButtonNode" type="button"></button>
+        <button id="testB4ButtonNode" type="button"></button>
+        <div id="testBResult">-</div>
+        <div id="bboxBResult">-</div>
     </div>
 
     <!-- load Dojo -->
@@ -87,6 +95,42 @@
                     dom.byId("bboxResult").innerHTML = crabZoomer.getBbox();
                 }
             }, "test4ButtonNode").startup();
+
+
+            //------------
+            var capakeyZoomer = crabpyWidget.createCapakeyZoomer('widgetNodeB');
+            capakeyZoomer.startup();
+
+            new Button({
+                label: "Get value",
+                onClick: function(){
+                    // Do something:
+                    dom.byId("testBResult").innerHTML = JSON.stringify(capakeyZoomer.get('value'));
+                }
+            }, "testBButtonNode").startup();
+
+            new Button({
+                label: "Set value",
+                onClick: function(){
+                    capakeyZoomer.set('value', {"gemeente":{"id":"11001","name":"Aartselaar"},"afdeling":{"id":"11001","name":"AARTSELAAR 1 AFD"},"sectie":{"id":"B","name":"B"},"perceel":{"id":"0008/00H002","name":"11001B0008/00H002"}});
+                }
+            }, "testB2ButtonNode").startup();
+
+            new Button({
+                label: "reset",
+                onClick: function(){
+                    capakeyZoomer.reset();
+                    dom.byId("testBResult").innerHTML = JSON.stringify(capakeyZoomer.get('value'));
+                    dom.byId("bboxBResult").innerHTML = JSON.stringify(capakeyZoomer.getBbox());
+                }
+            }, "testB3ButtonNode").startup();
+
+            new Button({
+                label: "get bbox",
+                onClick: function(){
+                    dom.byId("bboxBResult").innerHTML = capakeyZoomer.getBbox();
+                }
+            }, "testB4ButtonNode").startup();
         });
     </script>
 </body>

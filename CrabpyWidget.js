@@ -1,8 +1,9 @@
 define([
     "mijit/_WidgetBase",
     "dojo/_base/declare",
-    "./CrabZoomer"
-], function (_WidgetBase, declare, CrabZoomer) {
+    "./CrabZoomer",
+    "./CapakeyZoomer"
+], function (_WidgetBase, declare, CrabZoomer, CapakeyZoomer) {
 
     return declare([_WidgetBase], {
 
@@ -24,6 +25,15 @@ define([
         createCrabZoomer: function (node) {
             return new CrabZoomer({
                 name: "crabzoomer",
+                baseUrl: this.baseUrl,
+                baseClass: this.baseClass,
+                sortMethod: this._sortNatural
+            }, node);
+        },
+
+        createCapakeyZoomer: function (node) {
+            return new CapakeyZoomer({
+                name: "capakeyzoomer",
                 baseUrl: this.baseUrl,
                 baseClass: this.baseClass,
                 sortMethod: this._sortNatural

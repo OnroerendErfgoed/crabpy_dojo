@@ -12,6 +12,7 @@ define([
         templateString: '' +
             '<div data-dojo-attach-point="containerNode">' +
             '   <fieldset>' +
+            '       <legend>Adres:</legend>' +
             '       <div data-dojo-attach-point="provinceSelect"></div>' +
             '       <div data-dojo-attach-point="municipalitySelect"></div>' +
             '       <div data-dojo-attach-point="streetSelect"></div>' +

@@ -326,7 +326,6 @@ define([
                         "X-Requested-With": ""
                     }
                 }).then(function (jsondata) {
-                    console.log(jsondata.bounding_box);
                     bbox = jsondata.bounding_box;
                 },
                 function (error) {

@@ -46,42 +46,45 @@
             "dojo/json"
         ], function (CrabpyWidget, Button, dom, JSON) {
             // init widget
-            var widgetUnderTest = new CrabpyWidget({
+            var crabpyWidget = new CrabpyWidget({
                 name: "location",
                 baseUrl: "https://dev-geo.onroerenderfgoed.be"
-            }, 'widgetNode');
-            widgetUnderTest.startup();
+                // baseUrl: "http://localhost:6543"
+            });
 
-            var myButton = new Button({
+            var crabZoomer = crabpyWidget.createCrabZoomer('widgetNode');
+            crabZoomer.startup();
+
+            new Button({
                 label: "Get value",
                 onClick: function(){
                     // Do something:
-                    dom.byId("testResult").innerHTML = JSON.stringify(widgetUnderTest.get('value'));
+                    dom.byId("testResult").innerHTML = JSON.stringify(crabZoomer.get('value'));
                 }
             }, "testButtonNode").startup();
 
-            var myButton2 = new Button({
+            new Button({
                 label: "Set value",
                 onClick: function(){
-                    widgetUnderTest.set('value', {"province":{"id":"10000","name":"Antwerpen"},"municipality":{"id":"44","name":"Arendonk"},"street":{"id":"12417","name":"Aartrijtstraat"},"housenumber":{"id":"537126","name":"6"}});
-//                    widgetUnderTest.set('value', {"municipality":{"id":"44","name":"Arendonk"},"street":{"id":"12417","name":"Aartrijtstraat"},"housenumber":{"id":"537126","name":"6"}});
-//                    widgetUnderTest.set('value', {"province":{"id":"10000","name":"Antwerpen"}});
+                    crabZoomer.set('value', {"province":{"id":"10000","name":"Antwerpen"},"municipality":{"id":"44","name":"Arendonk"},"street":{"id":"12417","name":"Aartrijtstraat"},"housenumber":{"id":"537126","name":"6"}});
+//                    crabZoomer.set('value', {"municipality":{"id":"44","name":"Arendonk"},"street":{"id":"12417","name":"Aartrijtstraat"},"housenumber":{"id":"537126","name":"6"}});
+//                    crabZoomer.set('value', {"province":{"id":"10000","name":"Antwerpen"}});
                 }
             }, "test2ButtonNode").startup();
 
-            var myButton3 = new Button({
+            new Button({
                 label: "reset",
                 onClick: function(){
-                    widgetUnderTest.reset();
-                    dom.byId("testResult").innerHTML = JSON.stringify(widgetUnderTest.get('value'));
-                    dom.byId("bboxResult").innerHTML = JSON.stringify(widgetUnderTest.getBbox());
+                    crabZoomer.reset();
+                    dom.byId("testResult").innerHTML = JSON.stringify(crabZoomer.get('value'));
+                    dom.byId("bboxResult").innerHTML = JSON.stringify(crabZoomer.getBbox());
                 }
             }, "test3ButtonNode").startup();
 
-            var myButton4 = new Button({
+            new Button({
                 label: "get bbox",
                 onClick: function(){
-                    dom.byId("bboxResult").innerHTML = widgetUnderTest.getBbox();
+                    dom.byId("bboxResult").innerHTML = crabZoomer.getBbox();
                 }
             }, "test4ButtonNode").startup();
         });

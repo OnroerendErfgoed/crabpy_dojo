@@ -1,5 +1,7 @@
 # IDE stuff:
 .idea
 
-# js libraries:
-bower_components
+# javascript libraries
+dojo
+dojo-form-controls
+mijit

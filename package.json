@@ -1,0 +1,15 @@
+{
+    "name": "crabpy_dojo",
+    "description": "A lightweight widget designed for crabpy_pyramid",
+    "keywords": ["JavaScript", "Dojo", "Widget", "crabpy"],
+    "version": "1.0.0",
+	"repository": {
+		"type":"git",
+		"url":"https://github.com/OnroerendErfgoed/crabpy_dojo"
+	},
+    "main": "./CrabpyWidget",
+    "dojoBuild": "package.js",
+    "directories": {
+		"lib": "."
+	}
+}

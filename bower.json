@@ -8,8 +8,6 @@
     "tests",
     ".bowerrc",
     ".gitignore",
-    "bower.json",
-    "package.json",
     "README.md"
   ],
   "dependencies": {

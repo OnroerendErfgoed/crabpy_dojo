@@ -5,10 +5,10 @@
   "main": "CrabpyWidget.js",
   "ignore": [
     "test",
+    "tests",
     ".bowerrc",
     ".gitignore",
     "bower.json",
-    "Gruntfile.js",
     "package.json",
     "README.md"
   ],

@@ -1,7 +1,7 @@
 {
   "name": "crabpy_dojo",
   "description": "A lightweight widget designed for craby_pyramid",
-  "version": "1.0.0",
+  "version": "0.0.2",
   "main": "CrabpyWidget.js",
   "ignore": [
     "test",
@@ -11,7 +11,7 @@
     "README.md"
   ],
   "dependencies": {
-    "dojo": "~1.10.2",
+    "dojo": "~1.10.4",
     "dojo-form-controls": "https://github.com/sirprize/dojo-form-controls.git",
     "mijit": "git://github.com/sirprize/mijit.git#61a80b3518"
   }

@@ -1,6 +1,6 @@
 define([
-    "dijit/_WidgetBase",
-    "dijit/_TemplatedMixin",
+    "mijit/_WidgetBase",
+    "mijit/_TemplatedMixin",
     "dojo/_base/declare",
     "dojo/_base/array",
     "dojo/request",

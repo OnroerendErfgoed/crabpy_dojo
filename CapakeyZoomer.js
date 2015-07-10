@@ -1,6 +1,6 @@
 define([
-    "mijit/_WidgetBase",
-    "mijit/_TemplatedMixin",
+    "dijit/_WidgetBase",
+    "dijit/_TemplatedMixin",
     "dojo/_base/declare",
     "dojo/_base/array",
     "dojo/request",
@@ -10,14 +10,15 @@ define([
     return declare([_WidgetBase, _TemplatedMixin], {
 
         templateString: '' +
-            '<div data-dojo-attach-point="containerNode">' +
-            '   <fieldset>' +
-            '       <legend>Perceel:</legend>' +
-            '       <div data-dojo-attach-point="gemeenteSelect"></div>' +
-            '       <div data-dojo-attach-point="afdelingSelect"></div>' +
-            '       <div data-dojo-attach-point="sectieSelect"></div>' +
-            '       <div data-dojo-attach-point="perceelSelect"></div>' +
-            '   </fieldset>' +
+            '<div data-dojo-attach-point="containerNode" class="zoneerder-pane">' +
+            '   <div class="zoneerder-pane-header">Perceel</div>' +
+            '       <div class="zoneerder-pane-content">' +
+            '           <div data-dojo-attach-point="gemeenteSelect"></div>' +
+            '           <div data-dojo-attach-point="afdelingSelect"></div>' +
+            '           <div data-dojo-attach-point="sectieSelect"></div>' +
+            '           <div data-dojo-attach-point="perceelSelect"></div>' +
+            '       </div>' +
+            '   </div>' +
             '</div>',
         gemeenteSelector: null,
         afdelingSelector: null,

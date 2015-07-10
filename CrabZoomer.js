@@ -10,14 +10,15 @@ define([
     return declare([_WidgetBase, _TemplatedMixin], {
 
         templateString: '' +
-            '<div data-dojo-attach-point="containerNode">' +
-            '   <fieldset>' +
-            '       <legend>Adres:</legend>' +
-            '       <div data-dojo-attach-point="provinceSelect"></div>' +
-            '       <div data-dojo-attach-point="municipalitySelect"></div>' +
-            '       <div data-dojo-attach-point="streetSelect"></div>' +
-            '       <div data-dojo-attach-point="numberSelect"></div>' +
-            '   </fieldset>' +
+            '<div data-dojo-attach-point="containerNode" class="zoneerder-pane">' +
+            '   <div class="zoneerder-pane-header">Adres</div>' +
+            '       <div class="zoneerder-pane-content">' +
+            '           <div data-dojo-attach-point="provinceSelect"></div>' +
+            '           <div data-dojo-attach-point="municipalitySelect"></div>' +
+            '           <div data-dojo-attach-point="streetSelect"></div>' +
+            '           <div data-dojo-attach-point="numberSelect"></div>' +
+            '       </div>' +
+            '   </div>' +
             '</div>',
         provinceSelector: null,
         municipalitySelector: null,

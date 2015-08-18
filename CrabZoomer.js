@@ -35,7 +35,7 @@ define([
     baseUrl: null,
 
     postCreate: function () {
-      console.debug('CrabZoomer::postCreate');
+      //console.debug('CrabZoomer::postCreate');
       this.inherited(arguments);
 
       this._fillProvinceSelect(this.provinceList);
@@ -61,7 +61,7 @@ define([
             domAttr.remove(self.provinceSelect, "disabled");
           },
           function (error) {
-            console.error("An error occurred: " + error);
+            self._errorHandler(error);
           }
         );
       }
@@ -86,7 +86,7 @@ define([
             self.municipalityList = jsondata;
           },
           function (error) {
-            console.error("An error occurred: " + error);
+            self._errorHandler(error);
           }
         );
       }
@@ -96,12 +96,12 @@ define([
     },
 
     startup: function () {
-      console.debug('CrabZoomer::startup');
+      //console.debug('CrabZoomer::startup');
       this.inherited(arguments);
     },
 
     enable: function () {
-      console.debug('CrabZoomer::enable');
+      //console.debug('CrabZoomer::enable');
       this.disabled = false;
       domAttr.remove(this.provinceSelect, "disabled");
       domAttr.remove(this.municipalitySelect, "disabled");
@@ -110,7 +110,7 @@ define([
     },
 
     disable: function () {
-      console.debug('CrabZoomer::disable');
+      //console.debug('CrabZoomer::disable');
       this.disabled = true;
       domAttr.set(this.provinceSelect, "disabled", true);
       domAttr.set(this.municipalitySelect, "disabled", true);
@@ -119,9 +119,8 @@ define([
     },
 
     _provinceChange: function () {
-      console.debug('CrabZoomer::_provinceChange');
+      //console.debug('CrabZoomer::_provinceChange');
       var value = domUtils.getSelectedOption(this.provinceSelect);
-      console.log('Province:', value);
 
       this._setMunicipality('');
       this._setStreet('');
@@ -156,7 +155,6 @@ define([
 
           var location = self.value;
           if (location && location.municipality && location.province && location.province.id == value) {
-            console.debug('_provinceChange::location', location);
             self._setMunicipality(location.municipality.id);
           }
         },
@@ -167,9 +165,8 @@ define([
     },
 
     _municipalityChange: function () {
-      console.debug('CrabZoomer::_municipalityChange');
+      //console.debug('CrabZoomer::_municipalityChange');
       var value = domUtils.getSelectedOption(this.municipalitySelect);
-      console.log('Municipality:', value);
 
       this._setStreet('');
       this._setNumber('');
@@ -214,9 +211,8 @@ define([
     },
 
     _streetChange: function () {
-      console.debug('CrabZoomer::_streetChange');
+      //console.debug('CrabZoomer::_streetChange');
       var value = domUtils.getSelectedOption(this.streetSelect);
-      console.log('Street:', value);
 
       this._setNumber('');
       this.disable();
@@ -261,9 +257,8 @@ define([
     },
 
     _numberChange: function () {
-      console.debug('CrabZoomer::_numberChange');
+      //console.debug('CrabZoomer::_numberChange');
       var value = domUtils.getSelectedOption(this.numberSelect);
-      console.log('Number:', value);
     },
 
     _errorHandler: function (e){
@@ -273,7 +268,7 @@ define([
     },
 
     reset: function () {
-      console.debug('CrabZoomer::reset');
+      //console.debug('CrabZoomer::reset');
       this._fillMunicipalitySelect(this.municipalityCache);
       this._fillStreetSelect([]);
       this._fillNumberSelect([]);
@@ -290,7 +285,7 @@ define([
     },
 
     _getValueAttr: function () {
-      console.debug('CrabZoomer::_getValueAttr');
+      //console.debug('CrabZoomer::_getValueAttr');
       var address = {};
 
       if (domUtils.getSelectedOption(this.provinceSelect)) {
@@ -313,7 +308,7 @@ define([
     },
 
     _getSelectValueAsObect: function (select) {
-      console.debug('CrabZoomer::_getSelectValueAsObect');
+      //console.debug('CrabZoomer::_getSelectValueAsObect');
       return {
         id: domUtils.getSelectedOption(select),
         name: domUtils.getSelectedOptionLabel(select)
@@ -321,7 +316,7 @@ define([
     },
 
     _setValueAttr: function (location) {
-      console.debug('CrabZoomer::_setValueAttr', location);
+      //console.debug('CrabZoomer::_setValueAttr', location);
       this.value = location;
       if (location.province) {
         this._setProvince(location.province.id);
@@ -333,7 +328,7 @@ define([
     },
 
     getBbox: function () {
-      console.debug('CrabZoomer::getBbox');
+      //console.debug('CrabZoomer::getBbox');
       var bbox = null;
       var url = null;
       var number = domUtils.getSelectedOption(this.numberSelect);
@@ -355,7 +350,7 @@ define([
             bbox = jsondata.bounding_box;
           },
           function (error) {
-            console.log("An error occurred: " + error);
+            self._errorHandler(error);
           });
       }
 
@@ -363,7 +358,7 @@ define([
     },
 
     _fillProvinceSelect: function (data) {
-      console.debug('CrabZoomer::_fillProvinceSelect', data);
+      //console.debug('CrabZoomer::_fillProvinceSelect', data);
       domUtils.addSelectOptions(this.provinceSelect, {
         data: data,
         idProperty: 'niscode',
@@ -373,7 +368,7 @@ define([
     },
 
     _fillMunicipalitySelect: function (data) {
-      console.debug('CrabZoomer::_fillMunicipalitySelect', data);
+      //console.debug('CrabZoomer::_fillMunicipalitySelect', data);
       domUtils.addSelectOptions(this.municipalitySelect, {
         data: data,
         idProperty: 'id',
@@ -383,7 +378,7 @@ define([
     },
 
     _fillStreetSelect: function (data) {
-      console.debug('CrabZoomer::_fillStreetSelect', data);
+      //console.debug('CrabZoomer::_fillStreetSelect', data);
       domUtils.addSelectOptions(this.streetSelect, {
         data: data,
         idProperty: 'id',
@@ -393,7 +388,7 @@ define([
     },
 
     _fillNumberSelect: function (data) {
-      console.debug('CrabZoomer::_fillNumberSelect', data);
+      //console.debug('CrabZoomer::_fillNumberSelect', data);
       domUtils.addSelectOptions(this.numberSelect, {
         data: data,
         idProperty: 'id',
@@ -403,25 +398,25 @@ define([
     },
 
     _setProvince: function (value) {
-      console.debug('CrabZoomer::_setProvince', value);
+      //console.debug('CrabZoomer::_setProvince', value);
       domUtils.setSelectedOptions(this.provinceSelect, [value]);
       this._provinceChange();
     },
 
     _setMunicipality: function (value) {
-      console.debug('CrabZoomer::_setMunicipality', value);
+      //console.debug('CrabZoomer::_setMunicipality', value);
       domUtils.setSelectedOptions(this.municipalitySelect, [value]);
       this._municipalityChange();
     },
 
     _setStreet: function (value) {
-      console.debug('CrabZoomer::_setStreet', value);
+      //console.debug('CrabZoomer::_setStreet', value);
       domUtils.setSelectedOptions(this.streetSelect, [value]);
       this._streetChange();
     },
 
     _setNumber: function (value) {
-      console.debug('CrabZoomer::_setNumber', value);
+      //console.debug('CrabZoomer::_setNumber', value);
       domUtils.setSelectedOptions(this.numberSelect, [value]);
       this._numberChange();
     }

@@ -1,6 +1,5 @@
 define([
   'dojo/_base/declare',
-  'dojo/_base/array',
   'dojo/request',
   'dojo/dom-attr',
   'dijit/_WidgetBase',
@@ -8,7 +7,6 @@ define([
   './utils/DomUtils'
 ], function (
   declare,
-  array,
   request,
   domAttr,
   _WidgetBase,
@@ -36,7 +34,7 @@ define([
     baseUrl: null,
 
     postCreate: function () {
-      console.debug('CapakeyZoomer::postCreate');
+      //console.debug('CapakeyZoomer::postCreate');
       this.inherited(arguments);
 
       this._fillGemeenteSelect(this.gemeenteList);
@@ -45,38 +43,6 @@ define([
       this._fillPerceelSelect([]);
 
       var self = this;
-/*
-
-      sectieSelector.watch('value', function(name, old, value) {
-        if (!value) return false;
-        var afdeling = self.afdelingSelector.get('value');
-        if (!afdeling) return false;
-        var location = self.value;
-        sectieSelector.set('disabled', true);
-        perceelSelector.set('disabled', true);
-        perceelSelector.set('value', '');
-        request(self.baseUrl + "/capakey/afdelingen/" + afdeling + "/secties/" + value + "/percelen", {
-          handleAs: "json",
-          headers: {
-            "X-Requested-With": ""
-          }
-        }).then(function (jsondata) {
-            self._setSelectOptions(perceelSelector, jsondata);
-            sectieSelector.set('disabled', false);
-            perceelSelector.set('disabled', false);
-            if (location && location.perceel && location.sectie && location.sectie.id == value) {
-              perceelSelector.set('value', location.perceel.id);
-            }
-          },
-          function (error) {
-            self._errorHandler(error);
-          });
-      });
-
-      perceelSelector.watch('value', function(name, old, value) {
-        //
-      });
-*/
 
       if (this.gemeenteList == null) {
         request(this.baseUrl + "/capakey/gemeenten", {
@@ -103,18 +69,18 @@ define([
     },
 
     startup: function () {
-      console.debug('CapakeyZoomer::startup');
+      //console.debug('CapakeyZoomer::startup');
       this.inherited(arguments);
     },
 
     _errorHandler: function (e){
-      console.log("An error occurred in the crabpy dijit: " + e);
+      console.error("An error occurred in the crabpy dijit: " + e);
       this.reset();
       alert('Er is een fout opgetreden bij het aanspreken van de CRAB service');
     },
 
     reset: function () {
-      console.debug('CapakeyZoomer::reset');
+      //console.debug('CapakeyZoomer::reset');
       this._fillGemeenteSelect(this.gemeenteList);
       this._fillAfdelingSelect([]);
       this._fillSectieSelect([]);
@@ -133,7 +99,7 @@ define([
 
 
     enable: function () {
-      console.debug('CapakeyZoomer::enable');
+      //console.debug('CapakeyZoomer::enable');
       this.disabled = false;
       domAttr.remove(this.gemeenteSelect, "disabled");
       domAttr.remove(this.afdelingSelect, "disabled");
@@ -142,7 +108,7 @@ define([
     },
 
     disable: function () {
-      console.debug('CapakeyZoomer::disable');
+      //console.debug('CapakeyZoomer::disable');
       this.disabled = true;
       domAttr.set(this.gemeenteSelect, "disabled", true);
       domAttr.set(this.afdelingSelect, "disabled", true);
@@ -151,7 +117,7 @@ define([
     },
 
     _getValueAttr: function () {
-      console.debug('CapakeyZoomer::_getValueAttr');
+      //console.debug('CapakeyZoomer::_getValueAttr');
       var address = {};
 
       if (domUtils.getSelectedOption(this.gemeenteSelect)) {
@@ -171,7 +137,7 @@ define([
     },
 
     _getSelectValueAsObect: function (select) {
-      console.debug('CapakeyZoomer::_getSelectValueAsObect');
+      //console.debug('CapakeyZoomer::_getSelectValueAsObect');
       return {
         id: domUtils.getSelectedOption(select),
         name: domUtils.getSelectedOptionLabel(select)
@@ -179,7 +145,7 @@ define([
     },
 
     _setValueAttr: function (location) {
-      console.debug('CapakeyZoomer::_setValueAttr');
+      //console.debug('CapakeyZoomer::_setValueAttr');
       this.value = location;
       if (location.gemeente) {
         this._setGemeente(location.gemeente.id);
@@ -187,7 +153,7 @@ define([
     },
 
     getBbox: function () {
-      console.debug('CapakeyZoomer::getBbox');
+      //console.debug('CapakeyZoomer::getBbox');
       var bbox = null;
       var url = null;
 
@@ -196,7 +162,7 @@ define([
       var afdeling = domUtils.getSelectedOption(this.afdelingSelect);
       var gemeente = domUtils.getSelectedOption(this.gemeenteSelect);
 
-      if (perceel  && sectie && afdeling) {
+      if (perceel && sectie && afdeling) {
         url = this.baseUrl + "/capakey/afdelingen/" + afdeling + "/secties/" + sectie  + "/percelen/" + perceel;
       }
       else if (sectie && afdeling) {
@@ -227,7 +193,7 @@ define([
     },
 
     _fillGemeenteSelect: function (data) {
-      console.debug('CapakeyZoomer::_fillGemeenteSelect', data);
+      //console.debug('CapakeyZoomer::_fillGemeenteSelect', data);
       domUtils.addSelectOptions(this.gemeenteSelect, {
         data: data,
         idProperty: 'id',
@@ -237,7 +203,7 @@ define([
     },
 
     _fillAfdelingSelect: function (data) {
-      console.debug('CapakeyZoomer::_fillAfdelingSelect', data);
+      //console.debug('CapakeyZoomer::_fillAfdelingSelect', data);
       domUtils.addSelectOptions(this.afdelingSelect, {
         data: data,
         idProperty: 'id',
@@ -247,7 +213,7 @@ define([
     },
 
     _fillSectieSelect: function (data) {
-      console.debug('CapakeyZoomer::_fillSectieSelect', data);
+      //console.debug('CapakeyZoomer::_fillSectieSelect', data);
       domUtils.addSelectOptions(this.sectieSelect, {
         data: data,
         idProperty: 'id',
@@ -257,7 +223,7 @@ define([
     },
 
     _fillPerceelSelect: function (data) {
-      console.debug('CapakeyZoomer::_fillPerceelSelect', data);
+      //console.debug('CapakeyZoomer::_fillPerceelSelect', data);
       domUtils.addSelectOptions(this.perceelSelect, {
         data: data,
         idProperty: 'id',
@@ -268,7 +234,7 @@ define([
 
     _gemeenteChange: function () {
       var value = domUtils.getSelectedOption(this.gemeenteSelect);
-      console.debug('CapakeyZoomer::_gemeenteChange', value);
+      //console.debug('CapakeyZoomer::_gemeenteChange', value);
 
       this._setAfdeling('');
       this._setSectie('');
@@ -313,7 +279,7 @@ define([
 
     _afdelingChange: function () {
       var value = domUtils.getSelectedOption(this.afdelingSelect);
-      console.debug('CapakeyZoomer::_afdelingChange', value);
+      //console.debug('CapakeyZoomer::_afdelingChange', value);
 
       this._setSectie('');
       this._setPerceel('');
@@ -352,7 +318,7 @@ define([
     _sectieChange: function () {
       var value = domUtils.getSelectedOption(this.sectieSelect);
       var afdeling = domUtils.getSelectedOption(this.afdelingSelect);
-      console.debug('CapakeyZoomer::_sectieChange', value);
+      //console.debug('CapakeyZoomer::_sectieChange', value);
 
       this._setPerceel('');
       this.disable();
@@ -391,29 +357,29 @@ define([
     },
 
     _perceelChange: function () {
-      console.debug('CapakeyZoomer::_perceelChange');
+      //console.debug('CapakeyZoomer::_perceelChange');
     },
 
     _setGemeente: function (value) {
-      console.debug('CapakeyZoomer::_setGemeente', value);
+      //console.debug('CapakeyZoomer::_setGemeente', value);
       domUtils.setSelectedOptions(this.gemeenteSelect, [value]);
       this._gemeenteChange();
     },
 
     _setAfdeling: function (value) {
-      console.debug('CapakeyZoomer::_setAfdeling', value);
+      //console.debug('CapakeyZoomer::_setAfdeling', value);
       domUtils.setSelectedOptions(this.afdelingSelect, [value]);
       this._afdelingChange();
     },
 
     _setSectie: function (value) {
-      console.debug('CapakeyZoomer::_setSectie', value);
+      //console.debug('CapakeyZoomer::_setSectie', value);
       domUtils.setSelectedOptions(this.sectieSelect, [value]);
       this._sectieChange();
     },
 
     _setPerceel: function (value) {
-      console.debug('CapakeyZoomer::_setPerceel', value);
+      //console.debug('CapakeyZoomer::_setPerceel', value);
       domUtils.setSelectedOptions(this.perceelSelect, [value]);
       this._perceelChange();
     }

@@ -123,10 +123,10 @@ define([
       var value = domUtils.getSelectedOption(this.provinceSelect);
       console.log('Province:', value);
 
-      this.disable();
       this._setMunicipality('');
       this._setStreet('');
       this._setNumber('');
+      this.disable();
 
       if (!value) {
         this._fillMunicipalitySelect(this.municipalityCache);
@@ -171,9 +171,9 @@ define([
       var value = domUtils.getSelectedOption(this.municipalitySelect);
       console.log('Municipality:', value);
 
-      this.disable();
       this._setStreet('');
       this._setNumber('');
+      this.disable();
 
       if (!value) {
         this._fillStreetSelect([]);
@@ -218,8 +218,8 @@ define([
       var value = domUtils.getSelectedOption(this.streetSelect);
       console.log('Street:', value);
 
-      this.disable();
       this._setNumber('');
+      this.disable();
 
       if (!value) {
         this._fillNumberSelect([]);

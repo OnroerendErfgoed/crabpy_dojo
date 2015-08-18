@@ -102,4 +102,18 @@ require([
       dom.byId("bboxBResult").innerHTML = capakeyZoomer.getBbox();
     }
   }, "testB4ButtonNode").startup();
+
+  new Button({
+    label: "disable",
+    onClick: function(){
+      capakeyZoomer.disable();
+    }
+  }, "testB5ButtonNode").startup();
+
+  new Button({
+    label: "enable",
+    onClick: function(){
+      capakeyZoomer.enable();
+    }
+  }, "testB6ButtonNode").startup();
 });

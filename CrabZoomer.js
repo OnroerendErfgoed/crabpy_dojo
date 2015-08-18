@@ -1,170 +1,49 @@
 define([
-  "dojo/_base/declare",
-  "dojo/_base/array",
-  "dojo/request",
-  "dijit/_WidgetBase",
-  "dijit/_TemplatedMixin",
-  "dijit/form/Select"
+  'dojo/_base/declare',
+  'dojo/request',
+  'dojo/dom-attr',
+  'dijit/_WidgetBase',
+  'dijit/_TemplatedMixin',
+  './utils/DomUtils'
 ], function (
   declare,
-  array,
   request,
+  domAttr,
   _WidgetBase,
   _TemplatedMixin,
-  Select
+  domUtils
 ) {
   return declare([_WidgetBase, _TemplatedMixin], {
 
     templateString: '' +
     '<div data-dojo-attach-point="containerNode">' +
-    '   <fieldset>' +
-    '       <legend>Adres:</legend>' +
-    '       <div data-dojo-attach-point="provinceSelect"></div>' +
-    '       <div data-dojo-attach-point="municipalitySelect"></div>' +
-    '       <div data-dojo-attach-point="streetSelect"></div>' +
-    '       <div data-dojo-attach-point="numberSelect"></div>' +
-    '   </fieldset>' +
+    ' <fieldset>' +
+    '   <legend>Adres:</legend>' +
+    '   <select data-dojo-attach-point="provinceSelect" data-dojo-attach-event="onchange:_provinceChange" disabled></select>' +
+    '   <select data-dojo-attach-point="municipalitySelect" data-dojo-attach-event="onchange:_municipalityChange" disabled></select>' +
+    '   <select data-dojo-attach-point="streetSelect" data-dojo-attach-event="onchange:_streetChange" disabled></select>' +
+    '   <select data-dojo-attach-point="numberSelect" data-dojo-attach-event="onchange:_numberChange" disabled></select>' +
+    ' </fieldset>' +
     '</div>',
-    provinceSelector: null,
-    municipalitySelector: null,
-    streetSelector: null,
-    numberSelector: null,
     baseClass: null,
     value: null,
     name: null,
     sortMethod: null,
     provinceList: null,
     municipalityList: null,
-    disabled:false,
+    disabled: false,
     baseUrl: null,
 
     postCreate: function () {
+      console.debug('CrabZoomer::postCreate');
       this.inherited(arguments);
 
-      var provinceSelector = this._buildSelect("provinceSelector", "niscode", "naam", "Kies een provincie",
-        this.provinceSelect);
-      if (this.provinceList){
-        this._setSelectOptions(provinceSelector, this.provinceList);
-        provinceSelector.set('disabled', this.disabled);
-      }
-
-      var municipalitySelector = this._buildSelect("municipalitySelector", "id", "naam", "Kies een gemeente",
-        this.municipalitySelect);
-      if (this.municipalityList){
-        this._setSelectOptions(municipalitySelector, this.municipalityList);
-        municipalitySelector.set('disabled', this.disabled);
-      }
-
-      var streetSelector = this._buildSelect("streetSelector", "id", "label", "Kies een straat",
-        this.streetSelect);
-      var numberSelector = this._buildSelect("numberSelector", "id", "label", "Kies een huisnummer",
-        this.numberSelect);
-
-      this.provinceSelector = provinceSelector;
-      this.municipalitySelector = municipalitySelector;
-      this.streetSelector = streetSelector;
-      this.numberSelector = numberSelector;
+      this._fillProvinceSelect(this.provinceList);
+      this._fillMunicipalitySelect(this.municipalityList);
+      this._fillStreetSelect([]);
+      this._fillNumberSelect([]);
 
       var self = this;
-
-      provinceSelector.watch('value', function(name, old, value) {
-        var location = self.value;
-        provinceSelector.set('disabled', true);
-        municipalitySelector.set('disabled', true);
-        streetSelector.set('disabled', true);
-        numberSelector.set('disabled', true);
-        municipalitySelector.set('value', '');
-        streetSelector.set('value', '');
-        numberSelector.set('value', '');
-        if (!value) {
-          self._setSelectOptions(municipalitySelector, self.municipalityList);
-          provinceSelector.set('disabled', false);
-          municipalitySelector.set('disabled', false);
-          return false;
-        }
-
-        request(self.baseUrl + "/crab/provincies/" + value + "/gemeenten", {
-          handleAs: "json",
-          headers: {
-            "X-Requested-With": ""
-          }
-        }).then(function (jsondata) {
-            if (self.sortMethod) {
-              jsondata.sort(self.sortMethod);
-            }
-            self._setSelectOptions(municipalitySelector, jsondata);
-            provinceSelector.set('disabled', false);
-            municipalitySelector.set('disabled', false);
-            if (location && location.municipality && location.province && location.province.id == value) {
-              municipalitySelector.set('value', location.municipality.id);
-            }
-          },
-          function (error) {
-            self._errorHandler(error);
-          });
-      });
-
-      municipalitySelector.watch('value', function(name, old, value) {
-        if (!value) return false;
-        var location = self.value;
-        provinceSelector.set('disabled', true);
-        municipalitySelector.set('disabled', true);
-        streetSelector.set('disabled', true);
-        numberSelector.set('disabled', true);
-        streetSelector.set('value', '');
-        numberSelector.set('value', '');
-        request(self.baseUrl + "/crab/gemeenten/" + value + "/straten?aantal=5000", {
-          handleAs: "json",
-          headers: {
-            "X-Requested-With": ""
-          }
-        }).then(function (jsondata) {
-            if (self.sortMethod) {
-              jsondata.sort(self.sortMethod);
-            }
-            self._setSelectOptions(streetSelector, jsondata);
-            provinceSelector.set('disabled', false);
-            municipalitySelector.set('disabled', false);
-            streetSelector.set('disabled', false);
-            if (location && location.street && location.municipality && location.municipality.id == value) {
-              streetSelector.set('value', location.street.id);
-            }
-          },
-          function (error) {
-            self._errorHandler(error);
-          });
-      });
-
-      streetSelector.watch('value', function(name, old, value) {
-        if (!value) return false;
-        var location = self.value;
-        streetSelector.set('disabled', true);
-        numberSelector.set('disabled', true);
-        numberSelector.set('value', '');
-        request(self.baseUrl + "/crab/straten/" + value + "/huisnummers?aantal=5000", {
-          handleAs: "json",
-          headers: {
-            "X-Requested-With": ""
-          }
-        }).then(function (jsondata) {
-            if (self.sortMethod) {
-              jsondata.sort(self.sortMethod);
-            }
-            self._setSelectOptions(numberSelector, jsondata);
-            streetSelector.set('disabled', false);
-            numberSelector.set('disabled', false);
-            if (location && location.housenumber && location.street && location.street.id == value) {
-              numberSelector.set('value', location.housenumber.id);
-            }
-          },
-          function (error) {
-            self._errorHandler(error);
-          });
-      });
-
-      numberSelector.watch('value', function(name, old, value) {
-        //
-      });
 
       if (this.provinceList == null) {
         request(this.baseUrl + "/crab/gewesten/2/provincies", {
@@ -177,13 +56,17 @@ define([
             if (self.sortMethod) {
               jsondata.sort(self.sortMethod);
             }
-            self._setSelectOptions(provinceSelector, jsondata);
-            provinceSelector.set('disabled', false);
             self.provinceList  = jsondata;
+            self._fillProvinceSelect(jsondata);
+            domAttr.remove(self.provinceSelect, "disabled");
           },
           function (error) {
-            console.log("An error occurred: " + error);
-          });
+            console.error("An error occurred: " + error);
+          }
+        );
+      }
+      else {
+        domAttr.remove(self.provinceSelect, "disabled");
       }
 
       if (this.municipalityList == null) {
@@ -198,131 +81,289 @@ define([
               jsondata.sort(self.sortMethod);
             }
             self.municipalityCache = jsondata;
-            self._setSelectOptions(municipalitySelector, jsondata);
-            municipalitySelector.set('disabled', false);
+            self._fillMunicipalitySelect(jsondata);
+            domAttr.remove(self.municipalitySelect, "disabled");
             self.municipalityList = jsondata;
           },
           function (error) {
-            console.log("An error occurred: " + error);
-          });
+            console.error("An error occurred: " + error);
+          }
+        );
+      }
+      else {
+        domAttr.remove(self.municipalitySelect, "disabled");
       }
     },
 
     startup: function () {
+      console.debug('CrabZoomer::startup');
       this.inherited(arguments);
     },
 
-    enableDisableInput:function(bool)
-    {
-      this.disabled=bool;
-      this.provinceSelector.set('disabled', !this.disabled);
-      this.municipalitySelector.set('disabled', !this.disabled);
+    enable: function () {
+      console.debug('CrabZoomer::enable');
+      this.disabled = false;
+      domAttr.remove(this.provinceSelect, "disabled");
+      domAttr.remove(this.municipalitySelect, "disabled");
+      domAttr.remove(this.streetSelect, "disabled");
+      domAttr.remove(this.numberSelect, "disabled");
     },
 
-    _buildSelect: function (name, idfield, labelfield, placeholder, node) {
-      var defaultOption = [
-        { value: '', label: placeholder}
-      ];
-      return new Select({
-        name: name,
-        idfield: idfield,
-        labelfield: labelfield,
-        value: '',
-        options: defaultOption,
-        required: false
-      }, node);
+    disable: function () {
+      console.debug('CrabZoomer::disable');
+      this.disabled = true;
+      domAttr.set(this.provinceSelect, "disabled", true);
+      domAttr.set(this.municipalitySelect, "disabled", true);
+      domAttr.set(this.streetSelect, "disabled", true);
+      domAttr.set(this.numberSelect, "disabled", true);
     },
 
-    _setSelectOptions: function (select, jsondata) {
-      var defaultOption = [select.get('options')[0]];
-      var options = array.map(jsondata, function(object){
-        var returnObject = {};
-        returnObject.value = object[select.idfield].toString();
-        returnObject.label = object[select.labelfield];
-        return returnObject;
-      });
-      select.set('options', defaultOption.concat(options));
-    },
+    _provinceChange: function () {
+      console.debug('CrabZoomer::_provinceChange');
+      var value = domUtils.getSelectedOption(this.provinceSelect);
+      console.log('Province:', value);
 
-    _getSelectValue: function (selector) {
-      var value = selector.get('value');
-      var label = value;
-      array.some(selector.get('options'), function (option) {
-        if (option.value == value) {
-          label = option.label;
-          return false;
+      this.disable();
+      this._setMunicipality('');
+      this._setStreet('');
+      this._setNumber('');
+
+      if (!value) {
+        domUtils.addSelectOptions(this.municipalitySelect, {
+          data: this.municipalityCache,
+          idProperty: 'id',
+          labelProperty: 'naam',
+          placeholder: 'Kies een gemeente'
+        });
+        domAttr.remove(this.provinceSelect, "disabled");
+        domAttr.remove(this.municipalitySelect, "disabled");
+        return false;
+      }
+
+      var self = this;
+
+      request(this.baseUrl + "/crab/provincies/" + value + "/gemeenten", {
+        handleAs: "json",
+        headers: {
+          "X-Requested-With": ""
         }
-      });
-      return {id: value, name: label};
+      }).then(
+        function (jsondata) {
+          if (self.sortMethod) {
+            jsondata.sort(self.sortMethod);
+          }
+
+          domUtils.addSelectOptions(self.municipalitySelect, {
+            data: jsondata,
+            idProperty: 'id',
+            labelProperty: 'naam',
+            placeholder: 'Kies een gemeente'
+          });
+          domAttr.remove(self.provinceSelect, "disabled");
+          domAttr.remove(self.municipalitySelect, "disabled");
+
+          var location = self.value;
+          if (location && location.municipality && location.province && location.province.id == value) {
+            console.debug('_provinceChange::location', location);
+            self._setMunicipality(location.municipality.id);
+          }
+        },
+        function (error) {
+          self._errorHandler(error);
+        }
+      );
+    },
+
+    _municipalityChange: function () {
+      console.debug('CrabZoomer::_municipalityChange');
+      var value = domUtils.getSelectedOption(this.municipalitySelect);
+      console.log('Municipality:', value);
+
+      if (!value) return false;
+      this.disable();
+      this._setStreet('');
+      this._setNumber('');
+
+      var self = this;
+
+      request(this.baseUrl + "/crab/gemeenten/" + value + "/straten?aantal=5000", {
+        handleAs: "json",
+        headers: {
+          "X-Requested-With": ""
+        }
+      }).then(
+        function (jsondata) {
+          if (self.sortMethod) {
+            jsondata.sort(self.sortMethod);
+          }
+
+          domUtils.addSelectOptions(self.streetSelect, {
+            data: jsondata,
+            idProperty: 'id',
+            labelProperty: 'label',
+            placeholder: 'Kies een straat'
+          });
+
+          domAttr.remove(self.provinceSelect, "disabled");
+          domAttr.remove(self.municipalitySelect, "disabled");
+          domAttr.remove(self.streetSelect, "disabled");
+
+          var location = self.value;
+          if (location && location.street && location.municipality && location.municipality.id == value) {
+            self._setStreet(location.street.id);
+          }
+        },
+        function (error) {
+          self._errorHandler(error);
+        }
+      );
+    },
+
+    _streetChange: function () {
+      console.debug('CrabZoomer::_streetChange');
+      var value = domUtils.getSelectedOption(this.streetSelect);
+      console.log('Street:', value);
+
+      if (!value) return false;
+      this.disable();
+      this._setNumber('');
+
+      var self = this;
+      request(this.baseUrl + "/crab/straten/" + value + "/huisnummers?aantal=5000", {
+        handleAs: "json",
+        headers: {
+          "X-Requested-With": ""
+        }
+      }).then(
+        function (jsondata) {
+          if (self.sortMethod) {
+            jsondata.sort(self.sortMethod);
+          }
+
+          domUtils.addSelectOptions(self.numberSelect, {
+            data: jsondata,
+            idProperty: 'id',
+            labelProperty: 'label',
+            placeholder: 'Kies een huisnummer'
+          });
+
+          domAttr.remove(self.provinceSelect, "disabled");
+          domAttr.remove(self.municipalitySelect, "disabled");
+          domAttr.remove(self.streetSelect, "disabled");
+          domAttr.remove(self.numberSelect, "disabled");
+
+          var location = self.value;
+          if (location && location.housenumber && location.street && location.street.id == value) {
+            self._setNumber(location.housenumber.id);
+          }
+        },
+        function (error) {
+          self._errorHandler(error);
+        }
+      );
+    },
+
+    _numberChange: function () {
+      console.debug('CrabZoomer::_numberChange');
+      var value = domUtils.getSelectedOption(this.numberSelect);
+      console.log('Number:', value);
     },
 
     _errorHandler: function (e){
-      console.log("An error occurred in the crabpy dijit: " + e);
+      console.error("An error occurred in the crabpy dijit: " + e);
       this.reset();
       alert('Er is een fout opgetreden bij het aanspreken van de CRAB service');
     },
 
     reset: function () {
-      this._setSelectOptions(this.municipalitySelector, this.municipalityList);
-      this._setSelectOptions(this.streetSelector, []);
-      this._setSelectOptions(this.numberSelector, []);
+      console.debug('CrabZoomer::reset');
+      domUtils.addSelectOptions(this.municipalitySelect, {
+        data: this.municipalityCache,
+        idProperty: 'id',
+        labelProperty: 'naam',
+        placeholder: 'Kies een gemeente'
+      });
 
-      this.provinceSelector.set('value', '');
-      this.municipalitySelector.set('value', '');
-      this.streetSelector.set('value', '');
-      this.numberSelector.set('value', '');
+      domUtils.addSelectOptions(this.streetSelect, {
+        data: [],
+        idProperty: 'id',
+        labelProperty: 'label',
+        placeholder: 'Kies een straat'
+      });
 
-      this.provinceSelector.set('disabled', false);
-      this.municipalitySelector.set('disabled', false);
-      this.streetSelector.set('disabled', true);
-      this.numberSelector.set('disabled', true);
+      domUtils.addSelectOptions(this.numberSelect, {
+        data: [],
+        idProperty: 'id',
+        labelProperty: 'label',
+        placeholder: 'Kies een huisnummer'
+      });
+
+      this._setProvince('');
+      this._setMunicipality('');
+      this._setStreet('');
+      this._setNumber('');
+
+      domAttr.remove(this.provinceSelect, "disabled");
+      domAttr.remove(this.municipalitySelect, "disabled");
+      domAttr.set(this.streetSelect, "disabled", true);
+      domAttr.set(this.numberSelect, "disabled", true);
     },
 
     _getValueAttr: function () {
+      console.debug('CrabZoomer::_getValueAttr');
       var address = {};
 
-      if (this.provinceSelector.get('value')) {
-        address.province = this._getSelectValue(this.provinceSelector);
+      if (domUtils.getSelectedOption(this.provinceSelect)) {
+        address.province = this._getSelectValueAsObect(this.provinceSelect);
       }
 
-      if (this.municipalitySelector.get('value')) {
-        address.municipality = this._getSelectValue(this.municipalitySelector);
+      if (domUtils.getSelectedOption(this.municipalitySelect)) {
+        address.municipality = this._getSelectValueAsObect(this.municipalitySelect);
       }
 
-      if (this.streetSelector.get('value')) {
-        address.street = this._getSelectValue(this.streetSelector);
+      if (domUtils.getSelectedOption(this.streetSelect)) {
+        address.street = this._getSelectValueAsObect(this.streetSelect);
       }
 
-      if (this.numberSelector.get('value')) {
-        address.housenumber = this._getSelectValue(this.numberSelector);
+      if (domUtils.getSelectedOption(this.numberSelect)) {
+        address.housenumber = this._getSelectValueAsObect(this.numberSelect);
       }
 
       return address;
     },
 
+    _getSelectValueAsObect: function (select) {
+      console.debug('CrabZoomer::_getSelectValueAsObect');
+      return {
+        id: domUtils.getSelectedOption(select),
+        name: domUtils.getSelectedOptionLabel(select)
+      }
+    },
+
     _setValueAttr: function (location) {
+      console.debug('CrabZoomer::_setValueAttr', location);
       this.value = location;
       if (location.province) {
-        this.provinceSelector.set('value', location.province.id);
+        this._setProvince(location.province.id);
       }
       else if (location.municipality) {
-        this.municipalitySelector.set('value', location.municipality.id);
+        this._setMunicipality(location.municipality.id);
+
       }
     },
 
     getBbox: function () {
+      console.debug('CrabZoomer::getBbox');
       var bbox = null;
       var url = null;
+      var number = domUtils.getSelectedOption(this.numberSelect);
+      var street = domUtils.getSelectedOption(this.streetSelect);
+      var municipality = domUtils.getSelectedOption(this.municipalitySelect);
 
-      if (this.numberSelector.get('value')) {
-        url = this.baseUrl + "/crab/huisnummers/" + this.numberSelector.get('value');
-      }
-      else if (this.streetSelector.get('value')) {
-        url = this.baseUrl + "/crab/straten/" + this.streetSelector.get('value');
-      }
-      else if (this.municipalitySelector.get('value')) {
-        url = this.baseUrl + "/crab/gemeenten/" + this.municipalitySelector.get('value');
-      }
+      if (number) {url = this.baseUrl + "/crab/huisnummers/" + number;}
+      else if (street) {url = this.baseUrl + "/crab/straten/" + street;}
+      else if (municipality) {url = this.baseUrl + "/crab/gemeenten/" + municipality;}
+
       if (url) {
         request(url, {
           handleAs: "json",
@@ -337,7 +378,72 @@ define([
             console.log("An error occurred: " + error);
           });
       }
+
       return bbox;
+    },
+
+    _fillProvinceSelect: function (data) {
+      console.debug('CrabZoomer::_fillProvinceSelect', data);
+      domUtils.addSelectOptions(this.provinceSelect, {
+        data: data,
+        idProperty: 'niscode',
+        labelProperty: 'naam',
+        placeholder: 'Kies een provincie'
+      });
+    },
+
+    _fillMunicipalitySelect: function (data) {
+      console.debug('CrabZoomer::_fillMunicipalitySelect', data);
+      domUtils.addSelectOptions(this.municipalitySelect, {
+        data: data,
+        idProperty: 'id',
+        labelProperty: 'naam',
+        placeholder: 'Kies een gemeente'
+      });
+    },
+
+    _fillStreetSelect: function (data) {
+      console.debug('CrabZoomer::_fillStreetSelect', data);
+      domUtils.addSelectOptions(this.streetSelect, {
+        data: data,
+        idProperty: 'id',
+        labelProperty: 'label',
+        placeholder: 'Kies een straat'
+      });
+    },
+
+    _fillNumberSelect: function (data) {
+      console.debug('CrabZoomer::_fillNumberSelect', data);
+      domUtils.addSelectOptions(this.numberSelect, {
+        data: data,
+        idProperty: 'id',
+        labelProperty: 'label',
+        placeholder: 'Kies een huisnummer'
+      });
+    },
+
+    _setProvince: function (value) {
+      console.debug('CrabZoomer::_setProvince', value);
+      domUtils.setSelectedOptions(this.provinceSelect, [value]);
+      this._provinceChange();
+    },
+
+    _setMunicipality: function (value) {
+      console.debug('CrabZoomer::_setMunicipality', value);
+      domUtils.setSelectedOptions(this.municipalitySelect, [value]);
+      this._municipalityChange();
+    },
+
+    _setStreet: function (value) {
+      console.debug('CrabZoomer::_setStreet', value);
+      domUtils.setSelectedOptions(this.streetSelect, [value]);
+      this._streetChange();
+    },
+
+    _setNumber: function (value) {
+      console.debug('CrabZoomer::_setNumber', value);
+      domUtils.setSelectedOptions(this.numberSelect, [value]);
+      this._numberChange();
     }
   });
 });

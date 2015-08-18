@@ -53,6 +53,20 @@ require([
     }
   }, "test4ButtonNode").startup();
 
+  new Button({
+    label: "disable",
+    onClick: function(){
+      crabZoomer.disable();
+    }
+  }, "test5ButtonNode").startup();
+
+  new Button({
+    label: "enable",
+    onClick: function(){
+      crabZoomer.enable();
+    }
+  }, "test6ButtonNode").startup();
+
 
   //------------
   var capakeyZoomer = crabpyWidget.createCapakeyZoomer('widgetNodeB');

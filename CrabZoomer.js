@@ -130,6 +130,8 @@ define([
 
       if (!value) {
         this._fillMunicipalitySelect(this.municipalityCache);
+        this._fillStreetSelect([]);
+        this._fillNumberSelect([]);
         domAttr.remove(this.provinceSelect, "disabled");
         domAttr.remove(this.municipalitySelect, "disabled");
         return false;
@@ -169,10 +171,17 @@ define([
       var value = domUtils.getSelectedOption(this.municipalitySelect);
       console.log('Municipality:', value);
 
-      if (!value) return false;
       this.disable();
       this._setStreet('');
       this._setNumber('');
+
+      if (!value) {
+        this._fillStreetSelect([]);
+        this._fillNumberSelect([]);
+        domAttr.remove(this.provinceSelect, "disabled");
+        domAttr.remove(this.municipalitySelect, "disabled");
+        return false;
+      }
 
       var self = this;
 
@@ -209,11 +218,19 @@ define([
       var value = domUtils.getSelectedOption(this.streetSelect);
       console.log('Street:', value);
 
-      if (!value) return false;
       this.disable();
       this._setNumber('');
 
+      if (!value) {
+        this._fillNumberSelect([]);
+        domAttr.remove(this.provinceSelect, "disabled");
+        domAttr.remove(this.municipalitySelect, "disabled");
+        domAttr.remove(this.streetSelect, "disabled");
+        return false;
+      }
+
       var self = this;
+
       request(this.baseUrl + "/crab/straten/" + value + "/huisnummers?aantal=5000", {
         handleAs: "json",
         headers: {

@@ -56,7 +56,7 @@ define([
             if (self.sortMethod) {
               jsondata.sort(self.sortMethod);
             }
-            self.provinceList  = jsondata;
+            self.provinceList = jsondata;
             self._fillProvinceSelect(jsondata);
             domAttr.remove(self.provinceSelect, "disabled");
           },
@@ -129,12 +129,7 @@ define([
       this._setNumber('');
 
       if (!value) {
-        domUtils.addSelectOptions(this.municipalitySelect, {
-          data: this.municipalityCache,
-          idProperty: 'id',
-          labelProperty: 'naam',
-          placeholder: 'Kies een gemeente'
-        });
+        this._fillMunicipalitySelect(this.municipalityCache);
         domAttr.remove(this.provinceSelect, "disabled");
         domAttr.remove(this.municipalitySelect, "disabled");
         return false;
@@ -153,12 +148,7 @@ define([
             jsondata.sort(self.sortMethod);
           }
 
-          domUtils.addSelectOptions(self.municipalitySelect, {
-            data: jsondata,
-            idProperty: 'id',
-            labelProperty: 'naam',
-            placeholder: 'Kies een gemeente'
-          });
+          self._fillMunicipalitySelect(jsondata);
           domAttr.remove(self.provinceSelect, "disabled");
           domAttr.remove(self.municipalitySelect, "disabled");
 
@@ -197,12 +187,7 @@ define([
             jsondata.sort(self.sortMethod);
           }
 
-          domUtils.addSelectOptions(self.streetSelect, {
-            data: jsondata,
-            idProperty: 'id',
-            labelProperty: 'label',
-            placeholder: 'Kies een straat'
-          });
+          self._fillStreetSelect(jsondata);
 
           domAttr.remove(self.provinceSelect, "disabled");
           domAttr.remove(self.municipalitySelect, "disabled");
@@ -240,12 +225,7 @@ define([
             jsondata.sort(self.sortMethod);
           }
 
-          domUtils.addSelectOptions(self.numberSelect, {
-            data: jsondata,
-            idProperty: 'id',
-            labelProperty: 'label',
-            placeholder: 'Kies een huisnummer'
-          });
+          self._fillNumberSelect(jsondata);
 
           domAttr.remove(self.provinceSelect, "disabled");
           domAttr.remove(self.municipalitySelect, "disabled");
@@ -277,26 +257,9 @@ define([
 
     reset: function () {
       console.debug('CrabZoomer::reset');
-      domUtils.addSelectOptions(this.municipalitySelect, {
-        data: this.municipalityCache,
-        idProperty: 'id',
-        labelProperty: 'naam',
-        placeholder: 'Kies een gemeente'
-      });
-
-      domUtils.addSelectOptions(this.streetSelect, {
-        data: [],
-        idProperty: 'id',
-        labelProperty: 'label',
-        placeholder: 'Kies een straat'
-      });
-
-      domUtils.addSelectOptions(this.numberSelect, {
-        data: [],
-        idProperty: 'id',
-        labelProperty: 'label',
-        placeholder: 'Kies een huisnummer'
-      });
+      this._fillMunicipalitySelect(this.municipalityCache);
+      this._fillStreetSelect([]);
+      this._fillNumberSelect([]);
 
       this._setProvince('');
       this._setMunicipality('');

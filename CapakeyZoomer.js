@@ -1,5 +1,6 @@
 define([
   'dojo/_base/declare',
+  'dojo/_base/array',
   'dojo/request',
   'dojo/dom-attr',
   'dijit/_WidgetBase',
@@ -7,6 +8,7 @@ define([
   './utils/DomUtils'
 ], function (
   declare,
+  array,
   request,
   domAttr,
   _WidgetBase,
@@ -183,7 +185,11 @@ define([
             "X-Requested-With": ""
           }
         }).then(function (jsondata) {
-            bbox = jsondata.bounding_box;
+            if (jsondata.bounding_box) {
+              bbox = array.map(jsondata.bounding_box, function (item) {
+                return parseFloat(item);
+              });
+            }
           },
           function (error) {
             console.log("An error occurred: " + error);

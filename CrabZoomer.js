@@ -1,10 +1,10 @@
 define([
-    "mijit/_WidgetBase",
-    "mijit/_TemplatedMixin",
+    "dijit/_WidgetBase",
+    "dijit/_TemplatedMixin",
     "dojo/_base/declare",
     "dojo/_base/array",
     "dojo/request",
-    "dojo-form-controls/Select"
+    "dijit/form/Select"
 ], function (_WidgetBase, _TemplatedMixin, declare, array, request, Select) {
 
     return declare([_WidgetBase, _TemplatedMixin], {

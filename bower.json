@@ -12,7 +12,6 @@
   ],
   "dependencies": {
     "dojo": "~1.10.4",
-    "dojo-form-controls": "https://github.com/sirprize/dojo-form-controls.git#a7ff51997859ddec5f476534962258ad7ef4dde2",
-    "mijit": "https://github.com/sirprize/mijit.git#78a9bfa1666a84ae4a7ff657e5e84d4942933dc4"
+    "dijit": "~1.10.4"
   }
 }

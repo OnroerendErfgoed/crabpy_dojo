@@ -1,5 +1,5 @@
 define([
-    "mijit/_WidgetBase",
+    "dijit/_WidgetBase",
     "dojo/_base/declare",
     "./CrabZoomer",
     "./CapakeyZoomer"

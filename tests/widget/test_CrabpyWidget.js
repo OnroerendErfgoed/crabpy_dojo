@@ -1,6 +1,6 @@
 require([
     "crabpy_dojo/CrabpyWidget",
-    "dojo-form-controls/Button",
+    "dijit/form/Button",
     "dojo/dom",
     "dojo/json",
     "dojo/domReady!"

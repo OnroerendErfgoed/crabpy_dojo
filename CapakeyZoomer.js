@@ -1,311 +1,394 @@
 define([
-    "mijit/_WidgetBase",
-    "mijit/_TemplatedMixin",
-    "dojo/_base/declare",
-    "dojo/_base/array",
-    "dojo/request",
-    "dojo-form-controls/Select"
-], function (_WidgetBase, _TemplatedMixin, declare, array, request, Select) {
+  'dojo/_base/declare',
+  'dojo/_base/array',
+  'dojo/request',
+  'dojo/dom-attr',
+  'dijit/_WidgetBase',
+  'dijit/_TemplatedMixin',
+  './utils/DomUtils'
+], function (
+  declare,
+  array,
+  request,
+  domAttr,
+  _WidgetBase,
+  _TemplatedMixin,
+  domUtils
+) {
+  return declare([_WidgetBase, _TemplatedMixin], {
 
-    return declare([_WidgetBase, _TemplatedMixin], {
+    templateString: '' +
+    '<div data-dojo-attach-point="containerNode">' +
+    ' <fieldset>' +
+    '   <legend>Perceel:</legend>' +
+    '   <select data-dojo-attach-point="gemeenteSelect" data-dojo-attach-event="onchange:_gemeenteChange" disabled></select>' +
+    '   <select data-dojo-attach-point="afdelingSelect" data-dojo-attach-event="onchange:_afdelingChange" disabled></select>' +
+    '   <select data-dojo-attach-point="sectieSelect" data-dojo-attach-event="onchange:_sectieChange" disabled></select>' +
+    '   <select data-dojo-attach-point="perceelSelect" data-dojo-attach-event="onchange:_perceelChange" disabled></select>' +
+    ' </fieldset>' +
+    '</div>',
+    baseClass: null,
+    value: null,
+    name: null,
+    sortMethod: null,
+    gemeenteList: null,
+    disabled: false,
+    baseUrl: null,
 
-        templateString: '' +
-            '<div data-dojo-attach-point="containerNode" class="zoneerder-pane">' +
-            '   <div class="zoneerder-pane-header">Perceel</div>' +
-            '       <div class="zoneerder-pane-content">' +
-            '           <div data-dojo-attach-point="gemeenteSelect"></div>' +
-            '           <div data-dojo-attach-point="afdelingSelect"></div>' +
-            '           <div data-dojo-attach-point="sectieSelect"></div>' +
-            '           <div data-dojo-attach-point="perceelSelect"></div>' +
-            '       </div>' +
-            '   </div>' +
-            '</div>',
-        gemeenteSelector: null,
-        afdelingSelector: null,
-        sectieSelector: null,
-        perceelSelector: null,
-        baseClass: null,
-        value: null,
-        name: null,
-        sortMethod: null,
-        gemeenteList: null,
-        disabled:false,
-        baseUrl: null,
+    postCreate: function () {
+      //console.debug('CapakeyZoomer::postCreate');
+      this.inherited(arguments);
 
-        postCreate: function () {
-            this.inherited(arguments);
+      this._fillGemeenteSelect(this.gemeenteList);
+      this._fillAfdelingSelect([]);
+      this._fillSectieSelect([]);
+      this._fillPerceelSelect([]);
 
-            var gemeenteSelector = this._buildSelect("gemeenteSelector", "id", "naam", "Kies een gemeente",
-                this.gemeenteSelect);
+      var self = this;
 
-            var afdelingSelector = this._buildSelect("afdelingSelector", "id", "naam", "Kies een afdeling",
-                this.afdelingSelect);
-
-            var sectieSelector = this._buildSelect("sectieSelector", "id", "id", "Kies een sectie",
-                this.sectieSelect);
-
-            var perceelSelector = this._buildSelect("perceelSelector", "id", "capakey", "Kies een perceel",
-                this.perceelSelect);
-
-            this.gemeenteSelector = gemeenteSelector;
-            this.afdelingSelector = afdelingSelector;
-            this.sectieSelector = sectieSelector;
-            this.perceelSelector = perceelSelector;
-
-            var self = this;
-
-            gemeenteSelector.watch('value', function(name, old, value) {
-                var location = self.value;
-                gemeenteSelector.set('disabled', true);
-                afdelingSelector.set('disabled', true);
-                sectieSelector.set('disabled', true);
-                perceelSelector.set('disabled', true);
-                afdelingSelector.set('value', '');
-                sectieSelector.set('value', '');
-                perceelSelector.set('value', '');
-                if (!value) {
-                    self._setSelectOptions(afdelingSelector, self.municipalityList);
-                    gemeenteSelector.set('disabled', false);
-                    afdelingSelector.set('disabled', false);
-                    return false;
-                }
-
-                request(self.baseUrl + "/capakey/gemeenten/" + value + "/afdelingen", {
-                    handleAs: "json",
-                    headers: {
-                        "X-Requested-With": ""
-                    }
-                }).then(function (jsondata) {
-                        if (self.sortMethod) {
-                            jsondata.sort(self.sortMethod);
-                        }
-                        self._setSelectOptions(afdelingSelector, jsondata);
-                        gemeenteSelector.set('disabled', false);
-                        afdelingSelector.set('disabled', false);
-                        if (location && location.afdeling && location.gemeente && location.gemeente.id == value) {
-                            afdelingSelector.set('value', location.afdeling.id);
-                        }
-                    },
-                    function (error) {
-                        self._errorHandler(error);
-                    });
-            });
-
-            afdelingSelector.watch('value', function(name, old, value) {
-                if (!value) return false;
-                var location = self.value;
-                gemeenteSelector.set('disabled', true);
-                afdelingSelector.set('disabled', true);
-                sectieSelector.set('disabled', true);
-                perceelSelector.set('disabled', true);
-                sectieSelector.set('value', '');
-                perceelSelector.set('value', '');
-                request(self.baseUrl + "/capakey/afdelingen/" + value + "/secties", {
-                    handleAs: "json",
-                    headers: {
-                        "X-Requested-With": ""
-                    }
-                }).then(function (jsondata) {
-                        self._setSelectOptions(sectieSelector, jsondata);
-                        gemeenteSelector.set('disabled', false);
-                        afdelingSelector.set('disabled', false);
-                        sectieSelector.set('disabled', false);
-                        if (location && location.sectie && location.afdeling && location.afdeling.id == value) {
-                            sectieSelector.set('value', location.sectie.id);
-                        }
-                    },
-                    function (error) {
-                        self._errorHandler(error);
-                    });
-            });
-
-            sectieSelector.watch('value', function(name, old, value) {
-                if (!value) return false;
-                var afdeling = self.afdelingSelector.get('value');
-                if (!afdeling) return false;
-                var location = self.value;
-                sectieSelector.set('disabled', true);
-                perceelSelector.set('disabled', true);
-                perceelSelector.set('value', '');
-                request(self.baseUrl + "/capakey/afdelingen/" + afdeling + "/secties/" + value + "/percelen", {
-                    handleAs: "json",
-                    headers: {
-                        "X-Requested-With": ""
-                    }
-                }).then(function (jsondata) {
-                        self._setSelectOptions(perceelSelector, jsondata);
-                        sectieSelector.set('disabled', false);
-                        perceelSelector.set('disabled', false);
-                        if (location && location.perceel && location.sectie && location.sectie.id == value) {
-                            perceelSelector.set('value', location.perceel.id);
-                        }
-                    },
-                    function (error) {
-                        self._errorHandler(error);
-                    });
-            });
-
-            perceelSelector.watch('value', function(name, old, value) {
-                //
-            });
-
-            if (this.gemeenteList == null) {
-                request(this.baseUrl + "/capakey/gemeenten", {
-                    handleAs: "json",
-                    headers: {
-                        "X-Requested-With": ""
-                    }
-                }).then(
-                    function (jsondata) {
-                        if (self.sortMethod) {
-                            jsondata.sort(self.sortMethod);
-                        }
-                        self._setSelectOptions(gemeenteSelector, jsondata);
-                        gemeenteSelector.set('disabled', false);
-                        self.gemeenteList  = jsondata;
-                    },
-                    function (error) {
-                        console.log("An error occurred: " + error);
-                    });
+      if (this.gemeenteList == null) {
+        request(this.baseUrl + "/capakey/gemeenten", {
+          handleAs: "json",
+          headers: {
+            "X-Requested-With": ""
+          }
+        }).then(
+          function (jsondata) {
+            if (self.sortMethod) {
+              jsondata.sort(self.sortMethod);
             }
-        },
+            self.gemeenteList  = jsondata;
+            self._fillGemeenteSelect(jsondata);
+            domAttr.remove(self.gemeenteSelect, "disabled");
+          },
+          function (error) {
+            console.log("An error occurred: " + error);
+          });
+      }
+      else {
+        domAttr.remove(self.gemeenteSelect, "disabled");
+      }
+    },
 
-        startup: function () {
-            this.inherited(arguments);
-        },
+    startup: function () {
+      //console.debug('CapakeyZoomer::startup');
+      this.inherited(arguments);
+    },
 
-        enableDisableInput:function(bool)
-        {
-            this.disabled=bool;
-            this.gemeenteSelector.set('disabled', !this.disabled);
-            this.afdelingSelector.set('disabled', !this.disabled);
-        },
+    _errorHandler: function (e){
+      console.error("An error occurred in the crabpy dijit: " + e);
+      this.reset();
+      alert('Er is een fout opgetreden bij het aanspreken van de CRAB service');
+    },
 
-        _buildSelect: function (name, idfield, labelfield, placeholder, node) {
-            var defaultOption = [
-                { value: '', label: placeholder}
-            ];
-            return new Select({
-                name: name,
-                idfield: idfield,
-                labelfield: labelfield,
-                value: '',
-                options: defaultOption,
-                required: false
-            }, node);
-        },
+    reset: function () {
+      //console.debug('CapakeyZoomer::reset');
+      this._fillGemeenteSelect(this.gemeenteList);
+      this._fillAfdelingSelect([]);
+      this._fillSectieSelect([]);
+      this._fillPerceelSelect([]);
 
-        _setSelectOptions: function (select, jsondata) {
-            var defaultOption = [select.get('options')[0]];
-            var options = array.map(jsondata, function(object){
-                var returnObject = {};
-                returnObject.value = object[select.idfield].toString();
-                returnObject.label = object[select.labelfield];
-                return returnObject;
-            });
-            select.set('options', defaultOption.concat(options));
-        },
+      this._setGemeente('');
+      this._setAfdeling('');
+      this._setSectie('');
+      this._setPerceel('');
 
-        _getSelectValue: function (selector) {
-            var value = selector.get('value');
-            var label = value;
-            array.some(selector.get('options'), function (option) {
-                if (option.value == value) {
-                    label = option.label;
-                    return false;
-                }
-            });
-            return {id: value, name: label};
-        },
+      domAttr.remove(this.gemeenteSelect, "disabled");
+      domAttr.set(this.afdelingSelect, "disabled", true);
+      domAttr.set(this.sectieSelect, "disabled", true);
+      domAttr.set(this.perceelSelect, "disabled", true);
+    },
 
-        _errorHandler: function (e){
-            console.log("An error occurred in the crabpy dijit: " + e);
-            this.reset();
-            alert('Er is een fout opgetreden bij het aanspreken van de CRAB service');
-        },
 
-        reset: function () {
-            this._setSelectOptions(this.afdelingSelector, this.municipalityList);
-            this._setSelectOptions(this.sectieSelector, []);
-            this._setSelectOptions(this.perceelSelector, []);
+    enable: function () {
+      //console.debug('CapakeyZoomer::enable');
+      this.disabled = false;
+      domAttr.remove(this.gemeenteSelect, "disabled");
+      domAttr.remove(this.afdelingSelect, "disabled");
+      domAttr.remove(this.sectieSelect, "disabled");
+      domAttr.remove(this.perceelSelect, "disabled");
+    },
 
-            this.gemeenteSelector.set('value', '');
-            this.afdelingSelector.set('value', '');
-            this.sectieSelector.set('value', '');
-            this.perceelSelector.set('value', '');
+    disable: function () {
+      //console.debug('CapakeyZoomer::disable');
+      this.disabled = true;
+      domAttr.set(this.gemeenteSelect, "disabled", true);
+      domAttr.set(this.afdelingSelect, "disabled", true);
+      domAttr.set(this.sectieSelect, "disabled", true);
+      domAttr.set(this.perceelSelect, "disabled", true);
+    },
 
-            this.gemeenteSelector.set('disabled', false);
-            this.afdelingSelector.set('disabled', false);
-            this.sectieSelector.set('disabled', true);
-            this.perceelSelector.set('disabled', true);
-        },
+    _getValueAttr: function () {
+      //console.debug('CapakeyZoomer::_getValueAttr');
+      var address = {};
 
-        _getValueAttr: function () {
-            var address = {};
+      if (domUtils.getSelectedOption(this.gemeenteSelect)) {
+        address.gemeente = this._getSelectValueAsObect(this.gemeenteSelect);
+      }
+      if (domUtils.getSelectedOption(this.afdelingSelect)) {
+        address.afdeling = this._getSelectValueAsObect(this.afdelingSelect);
+      }
+      if (domUtils.getSelectedOption(this.sectieSelect)) {
+        address.sectie = this._getSelectValueAsObect(this.sectieSelect);
+      }
+      if (domUtils.getSelectedOption(this.perceelSelect)) {
+        address.perceel = this._getSelectValueAsObect(this.perceelSelect);
+      }
 
-            if (this.gemeenteSelector.get('value')) {
-                address.gemeente = this._getSelectValue(this.gemeenteSelector);
+      return address;
+    },
+
+    _getSelectValueAsObect: function (select) {
+      //console.debug('CapakeyZoomer::_getSelectValueAsObect');
+      return {
+        id: domUtils.getSelectedOption(select),
+        name: domUtils.getSelectedOptionLabel(select)
+      }
+    },
+
+    _setValueAttr: function (location) {
+      //console.debug('CapakeyZoomer::_setValueAttr');
+      this.value = location;
+      if (location.gemeente) {
+        this._setGemeente(location.gemeente.id);
+      }
+    },
+
+    getBbox: function () {
+      //console.debug('CapakeyZoomer::getBbox');
+      var bbox = null;
+      var url = null;
+
+      var perceel = domUtils.getSelectedOption(this.perceelSelect);
+      var sectie = domUtils.getSelectedOption(this.sectieSelect);
+      var afdeling = domUtils.getSelectedOption(this.afdelingSelect);
+      var gemeente = domUtils.getSelectedOption(this.gemeenteSelect);
+
+      if (perceel && sectie && afdeling) {
+        url = this.baseUrl + "/capakey/afdelingen/" + afdeling + "/secties/" + sectie  + "/percelen/" + perceel;
+      }
+      else if (sectie && afdeling) {
+        url = this.baseUrl + "/capakey/afdelingen/" + afdeling + "/secties/" + sectie;
+      }
+      else if (afdeling) {
+        url = this.baseUrl + "/capakey/afdelingen/" + afdeling;
+      }
+      else if (gemeente) {
+        url = this.baseUrl + "/capakey/gemeenten/" + gemeente;
+      }
+
+      if (url) {
+        request(url, {
+          handleAs: "json",
+          sync: true,
+          headers: {
+            "X-Requested-With": ""
+          }
+        }).then(function (jsondata) {
+            if (jsondata.bounding_box) {
+              bbox = array.map(jsondata.bounding_box, function (item) {
+                return parseFloat(item);
+              });
             }
+          },
+          function (error) {
+            console.log("An error occurred: " + error);
+          });
+      }
+      return bbox;
+    },
 
-            if (this.afdelingSelector.get('value')) {
-                address.afdeling = this._getSelectValue(this.afdelingSelector);
-            }
+    _fillGemeenteSelect: function (data) {
+      //console.debug('CapakeyZoomer::_fillGemeenteSelect', data);
+      domUtils.addSelectOptions(this.gemeenteSelect, {
+        data: data,
+        idProperty: 'id',
+        labelProperty: 'naam',
+        placeholder: 'Kies een gemeente'
+      });
+    },
 
-            if (this.sectieSelector.get('value')) {
-                address.sectie = this._getSelectValue(this.sectieSelector);
-            }
+    _fillAfdelingSelect: function (data) {
+      //console.debug('CapakeyZoomer::_fillAfdelingSelect', data);
+      domUtils.addSelectOptions(this.afdelingSelect, {
+        data: data,
+        idProperty: 'id',
+        labelProperty: 'naam',
+        placeholder: 'Kies een afdeling'
+      });
+    },
 
-            if (this.perceelSelector.get('value')) {
-                address.perceel = this._getSelectValue(this.perceelSelector);
-            }
+    _fillSectieSelect: function (data) {
+      //console.debug('CapakeyZoomer::_fillSectieSelect', data);
+      domUtils.addSelectOptions(this.sectieSelect, {
+        data: data,
+        idProperty: 'id',
+        labelProperty: 'id',
+        placeholder: 'Kies een sectie'
+      });
+    },
 
-            return address;
-        },
+    _fillPerceelSelect: function (data) {
+      //console.debug('CapakeyZoomer::_fillPerceelSelect', data);
+      domUtils.addSelectOptions(this.perceelSelect, {
+        data: data,
+        idProperty: 'id',
+        labelProperty: 'capakey',
+        placeholder: 'Kies een perceel'
+      });
+    },
 
-        _setValueAttr: function (location) {
-            this.value = location;
-            if (location.gemeente) {
-                this.gemeenteSelector.set('value', location.gemeente.id);
-            }
-        },
+    _gemeenteChange: function () {
+      var value = domUtils.getSelectedOption(this.gemeenteSelect);
+      //console.debug('CapakeyZoomer::_gemeenteChange', value);
 
-        getBbox: function () {
-            var bbox = null;
-            var url = null;
+      this._setAfdeling('');
+      this._setSectie('');
+      this._setPerceel('');
+      this.disable();
 
-            var perceel = this.perceelSelector.get('value');
-            var sectie = this.sectieSelector.get('value');
-            var afdeling = this.afdelingSelector.get('value');
-            var gemeente = this.gemeenteSelector.get('value');
+      if (!value) {
+        this._fillAfdelingSelect([]);
+        this._fillSectieSelect([]);
+        this._fillPerceelSelect([]);
+        domAttr.remove(this.gemeenteSelect, "disabled");
+        return false;
+      }
 
-            if (perceel  && sectie && afdeling) {
-                url = this.baseUrl + "/capakey/afdelingen/" + afdeling + "/secties/" + sectie  + "/percelen/" + perceel;
-            }
-            else if (sectie && afdeling) {
-                url = this.baseUrl + "/capakey/afdelingen/" + afdeling + "/secties/" + sectie;
-            }
-            else if (afdeling) {
-                url = this.baseUrl + "/capakey/afdelingen/" + afdeling;
-            }
-            else if (gemeente) {
-                url = this.baseUrl + "/capakey/gemeenten/" + gemeente;
-            }
+      var self = this;
 
-            if (url) {
-                request(url, {
-                    handleAs: "json",
-                    sync: true,
-                    headers: {
-                        "X-Requested-With": ""
-                    }
-                }).then(function (jsondata) {
-                    bbox = jsondata.bounding_box;
-                },
-                function (error) {
-                    console.log("An error occurred: " + error);
-                });
-            }
-            return bbox;
+      request(this.baseUrl + "/capakey/gemeenten/" + value + "/afdelingen", {
+        handleAs: "json",
+        headers: {
+          "X-Requested-With": ""
         }
-    });
+      }).then(
+        function (jsondata) {
+          if (self.sortMethod) {
+            jsondata.sort(self.sortMethod);
+          }
+
+          self._fillAfdelingSelect(jsondata);
+          domAttr.remove(self.gemeenteSelect, "disabled");
+          domAttr.remove(self.afdelingSelect, "disabled");
+          var location = self.value;
+          if (location && location.afdeling && location.gemeente && location.gemeente.id == value) {
+            self._setAfdeling(location.afdeling.id);
+          }
+        },
+        function (error) {
+          self._errorHandler(error);
+        }
+      );
+
+    },
+
+    _afdelingChange: function () {
+      var value = domUtils.getSelectedOption(this.afdelingSelect);
+      //console.debug('CapakeyZoomer::_afdelingChange', value);
+
+      this._setSectie('');
+      this._setPerceel('');
+      this.disable();
+
+       if (!value) {
+        this._fillSectieSelect([]);
+        this._fillPerceelSelect([]);
+        domAttr.remove(this.gemeenteSelect, "disabled");
+        domAttr.remove(this.afdelingSelect, "disabled");
+        return false;
+      }
+
+      var self = this;
+
+      request(this.baseUrl + "/capakey/afdelingen/" + value + "/secties", {
+        handleAs: "json",
+        headers: {
+          "X-Requested-With": ""
+        }
+      }).then(function (jsondata) {
+          self._fillSectieSelect(jsondata);
+          domAttr.remove(self.gemeenteSelect, "disabled");
+          domAttr.remove(self.afdelingSelect, "disabled");
+          domAttr.remove(self.sectieSelect, "disabled");
+          var location = self.value;
+          if (location && location.sectie && location.afdeling && location.afdeling.id == value) {
+            self._setSectie(location.sectie.id);
+          }
+        },
+        function (error) {
+          self._errorHandler(error);
+        });
+    },
+
+    _sectieChange: function () {
+      var value = domUtils.getSelectedOption(this.sectieSelect);
+      var afdeling = domUtils.getSelectedOption(this.afdelingSelect);
+      //console.debug('CapakeyZoomer::_sectieChange', value);
+
+      this._setPerceel('');
+      this.disable();
+
+      if (!value) {
+        this._fillPerceelSelect([]);
+        domAttr.remove(this.gemeenteSelect, "disabled");
+        domAttr.remove(this.afdelingSelect, "disabled");
+        domAttr.remove(this.sectieSelect, "disabled");
+        return false;
+      }
+
+      var self = this;
+
+      request(self.baseUrl + "/capakey/afdelingen/" + afdeling + "/secties/" + value + "/percelen", {
+        handleAs: "json",
+        headers: {
+          "X-Requested-With": ""
+        }
+      }).then(
+        function (jsondata) {
+          self._fillPerceelSelect(jsondata);
+          domAttr.remove(self.gemeenteSelect, "disabled");
+          domAttr.remove(self.afdelingSelect, "disabled");
+          domAttr.remove(self.sectieSelect, "disabled");
+          domAttr.remove(self.perceelSelect, "disabled");
+          var location = self.value;
+          if (location && location.perceel && location.sectie && location.sectie.id == value) {
+            self._setPerceel(location.perceel.id);
+          }
+        },
+        function (error) {
+          self._errorHandler(error);
+        }
+      );
+    },
+
+    _perceelChange: function () {
+      //console.debug('CapakeyZoomer::_perceelChange');
+    },
+
+    _setGemeente: function (value) {
+      //console.debug('CapakeyZoomer::_setGemeente', value);
+      domUtils.setSelectedOptions(this.gemeenteSelect, [value]);
+      this._gemeenteChange();
+    },
+
+    _setAfdeling: function (value) {
+      //console.debug('CapakeyZoomer::_setAfdeling', value);
+      domUtils.setSelectedOptions(this.afdelingSelect, [value]);
+      this._afdelingChange();
+    },
+
+    _setSectie: function (value) {
+      //console.debug('CapakeyZoomer::_setSectie', value);
+      domUtils.setSelectedOptions(this.sectieSelect, [value]);
+      this._sectieChange();
+    },
+
+    _setPerceel: function (value) {
+      //console.debug('CapakeyZoomer::_setPerceel', value);
+      domUtils.setSelectedOptions(this.perceelSelect, [value]);
+      this._perceelChange();
+    }
+
+  });
 });

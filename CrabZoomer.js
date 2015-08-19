@@ -18,14 +18,14 @@ define([
   return declare([_WidgetBase, _TemplatedMixin], {
 
     templateString: '' +
-    '<div data-dojo-attach-point="containerNode">' +
-    ' <fieldset>' +
-    '   <legend>Adres:</legend>' +
-    '   <select data-dojo-attach-point="provinceSelect" data-dojo-attach-event="onchange:_provinceChange" disabled></select>' +
-    '   <select data-dojo-attach-point="municipalitySelect" data-dojo-attach-event="onchange:_municipalityChange" disabled></select>' +
-    '   <select data-dojo-attach-point="streetSelect" data-dojo-attach-event="onchange:_streetChange" disabled></select>' +
-    '   <select data-dojo-attach-point="numberSelect" data-dojo-attach-event="onchange:_numberChange" disabled></select>' +
-    ' </fieldset>' +
+    '<div data-dojo-attach-point="containerNode" class="widget-pane">' +
+    '  <div class="widget-pane-header">Adres</div>' +
+    '  <div class="widget-pane-content">' +
+    '    <select data-dojo-attach-point="provinceSelect" data-dojo-attach-event="onchange:_provinceChange" disabled></select>' +
+    '    <select data-dojo-attach-point="municipalitySelect" data-dojo-attach-event="onchange:_municipalityChange" disabled></select>' +
+    '    <select data-dojo-attach-point="streetSelect" data-dojo-attach-event="onchange:_streetChange" disabled></select>' +
+    '    <select data-dojo-attach-point="numberSelect" data-dojo-attach-event="onchange:_numberChange" disabled></select>' +
+    '  </div>' +
     '</div>',
     baseClass: null,
     value: null,

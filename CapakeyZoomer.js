@@ -18,14 +18,14 @@ define([
   return declare([_WidgetBase, _TemplatedMixin], {
 
     templateString: '' +
-    '<div data-dojo-attach-point="containerNode">' +
-    ' <fieldset>' +
-    '   <legend>Perceel:</legend>' +
-    '   <select data-dojo-attach-point="gemeenteSelect" data-dojo-attach-event="onchange:_gemeenteChange" disabled></select>' +
-    '   <select data-dojo-attach-point="afdelingSelect" data-dojo-attach-event="onchange:_afdelingChange" disabled></select>' +
-    '   <select data-dojo-attach-point="sectieSelect" data-dojo-attach-event="onchange:_sectieChange" disabled></select>' +
-    '   <select data-dojo-attach-point="perceelSelect" data-dojo-attach-event="onchange:_perceelChange" disabled></select>' +
-    ' </fieldset>' +
+    '<div data-dojo-attach-point="containerNode" class="widget-pane">' +
+    '  <div class="widget-pane-header">Perceel</div>' +
+    '  <div class="widget-pane-content">' +
+    '    <select data-dojo-attach-point="gemeenteSelect" data-dojo-attach-event="onchange:_gemeenteChange" disabled></select>' +
+    '    <select data-dojo-attach-point="afdelingSelect" data-dojo-attach-event="onchange:_afdelingChange" disabled></select>' +
+    '    <select data-dojo-attach-point="sectieSelect" data-dojo-attach-event="onchange:_sectieChange" disabled></select>' +
+    '    <select data-dojo-attach-point="perceelSelect" data-dojo-attach-event="onchange:_perceelChange" disabled></select>' +
+    '  </div>' +
     '</div>',
     baseClass: null,
     value: null,

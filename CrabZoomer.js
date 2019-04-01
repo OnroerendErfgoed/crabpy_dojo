@@ -3,30 +3,36 @@ define([
   'dojo/_base/array',
   'dojo/request',
   'dojo/dom-attr',
+  'dojo/store/Memory',
   'dijit/_WidgetBase',
   'dijit/_TemplatedMixin',
+  'dijit/_WidgetsInTemplateMixin',
+  'dijit/form/ComboBox',
   './utils/DomUtils'
 ], function (
   declare,
   array,
   request,
   domAttr,
+  Memory,
   _WidgetBase,
   _TemplatedMixin,
+  _WidgetsInTemplateMixin,
+  ComboBox,
   domUtils
 ) {
-  return declare([_WidgetBase, _TemplatedMixin], {
+  return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
 
     templateString: '' +
-    '<div data-dojo-attach-point="containerNode" class="widget-pane">' +
-    '  <div class="widget-pane-header">Adres</div>' +
-    '  <div class="widget-pane-content">' +
-    '    <select data-dojo-attach-point="provinceSelect" data-dojo-attach-event="onchange:_provinceChange" disabled></select>' +
-    '    <select data-dojo-attach-point="municipalitySelect" data-dojo-attach-event="onchange:_municipalityChange" disabled></select>' +
-    '    <select data-dojo-attach-point="streetSelect" data-dojo-attach-event="onchange:_streetChange" disabled></select>' +
-    '    <select data-dojo-attach-point="numberSelect" data-dojo-attach-event="onchange:_numberChange" disabled></select>' +
-    '  </div>' +
-    '</div>',
+      '<div data-dojo-attach-point="containerNode" class="widget-pane">' +
+      '  <div class="widget-pane-header">Adres</div>' +
+      '  <div class="widget-pane-content">' +
+      '    <select data-dojo-attach-point="provinceSelect" data-dojo-attach-event="onchange:_provinceChange" disabled></select>' +
+      '    <select data-dojo-attach-point="municipalitySelect" data-dojo-attach-event="onchange:_municipalityChange" disabled></select>' +
+      '    <select data-dojo-attach-point="streetSelect" data-dojo-attach-event="onchange:_streetChange" disabled></select>' +
+      '    <select data-dojo-attach-point="numberSelect" data-dojo-attach-event="onchange:_numberChange" disabled></select>' +
+      '  </div>' +
+      '</div>',
     baseClass: null,
     value: null,
     name: null,
@@ -35,6 +41,7 @@ define([
     municipalityList: null,
     disabled: false,
     baseUrl: null,
+    _nummerFilteringSelect: null,
 
     postCreate: function () {
       //console.debug('CrabZoomer::postCreate');
@@ -44,6 +51,7 @@ define([
       this._fillMunicipalitySelect(this.municipalityList);
       this._fillStreetSelect([]);
       this._fillNumberSelect([]);
+      this._createNumberSelect();
 
       var self = this;
 
@@ -108,7 +116,8 @@ define([
       domAttr.remove(this.provinceSelect, "disabled");
       domAttr.remove(this.municipalitySelect, "disabled");
       domAttr.remove(this.streetSelect, "disabled");
-      domAttr.remove(this.numberSelect, "disabled");
+      // domAttr.remove(this.numberSelect, "disabled");
+      this._nummerFilteringSelect.set('disabled', false);
     },
 
     disable: function () {
@@ -117,7 +126,21 @@ define([
       domAttr.set(this.provinceSelect, "disabled", true);
       domAttr.set(this.municipalitySelect, "disabled", true);
       domAttr.set(this.streetSelect, "disabled", true);
-      domAttr.set(this.numberSelect, "disabled", true);
+      // domAttr.set(this.numberSelect, "disabled", true);
+      this._nummerFilteringSelect.set('disabled', true);
+    },
+
+    _createNumberSelect: function() {
+      this._nummerFilteringSelect = new ComboBox({
+        store: new Memory(),
+        hasDownArrow: true,
+        placeHolder: 'Kies een huisnummer',
+        searchAttr: 'label',
+        autoComplete: false,
+        required: false,
+        disabled: true,
+        'class': 'placeholder-input'
+      }, this.numberSelect);
     },
 
     _provinceChange: function () {
@@ -245,11 +268,12 @@ define([
           domAttr.remove(self.provinceSelect, "disabled");
           domAttr.remove(self.municipalitySelect, "disabled");
           domAttr.remove(self.streetSelect, "disabled");
-          domAttr.remove(self.numberSelect, "disabled");
+          // domAttr.remove(self.numberSelect, "disabled");
+          self._nummerFilteringSelect.set('disabled', false);
 
           var location = self.value;
           if (location && location.housenumber && location.street && location.street.id == value) {
-            self._setNumber(location.housenumber.id);
+            self._setNumber(location.housenumber);
           }
         },
         function (error) {
@@ -260,7 +284,7 @@ define([
 
     _numberChange: function () {
       //console.debug('CrabZoomer::_numberChange');
-      var value = domUtils.getSelectedOption(this.numberSelect);
+      // var value = domUtils.getSelectedOption(this.numberSelect);
     },
 
     _errorHandler: function (e){
@@ -283,11 +307,12 @@ define([
       domAttr.remove(this.provinceSelect, "disabled");
       domAttr.remove(this.municipalitySelect, "disabled");
       domAttr.set(this.streetSelect, "disabled", true);
-      domAttr.set(this.numberSelect, "disabled", true);
+      // domAttr.set(this.numberSelect, "disabled", true);
+      this._nummerFilteringSelect.set('disabled', true);
     },
 
     _getValueAttr: function () {
-      //console.debug('CrabZoomer::_getValueAttr');
+      console.debug('CrabZoomer::_getValueAttr');
       var address = {};
 
       if (domUtils.getSelectedOption(this.provinceSelect)) {
@@ -302,8 +327,20 @@ define([
         address.street = this._getSelectValueAsObect(this.streetSelect);
       }
 
-      if (domUtils.getSelectedOption(this.numberSelect)) {
-        address.housenumber = this._getSelectValueAsObect(this.numberSelect);
+      // if (domUtils.getSelectedOption(this.numberSelect)) {
+      //   address.housenumber = this._getSelectValueAsObect(this.numberSelect);
+      // }
+
+      var houseNumberObj = this._nummerFilteringSelect.item;
+      console.debug('CrabZoomer::_getValueAttr::houseNumberObj', houseNumberObj);
+      if (houseNumberObj) {
+        address.housenumber = {
+          id: houseNumberObj.id,
+          name: houseNumberObj.label
+        };
+      }
+      else if (this._nummerFilteringSelect.get('value')) {
+        address.housenumber = {name: this._nummerFilteringSelect.get('value')};
       }
 
       return address;
@@ -393,14 +430,17 @@ define([
       });
     },
 
-    _fillNumberSelect: function (data) {
-      //console.debug('CrabZoomer::_fillNumberSelect', data);
-      domUtils.addSelectOptions(this.numberSelect, {
-        data: data,
-        idProperty: 'id',
-        labelProperty: 'label',
-        placeholder: 'Kies een huisnummer'
-      });
+    _fillNumberSelect: function (nummers) {
+      console.debug('CrabZoomer::_fillNumberSelect', nummers);
+      if (nummers && nummers.length > 0) {
+        this._nummerFilteringSelect.set('store', new Memory({data: nummers}));
+      }
+      // domUtils.addSelectOptions(this.numberSelect, {
+      //   data: data,
+      //   idProperty: 'id',
+      //   labelProperty: 'label',
+      //   placeholder: 'Kies een huisnummer'
+      // });
     },
 
     _setProvince: function (value) {
@@ -422,8 +462,32 @@ define([
     },
 
     _setNumber: function (value) {
-      //console.debug('CrabZoomer::_setNumber', value);
-      domUtils.setSelectedOptions(this.numberSelect, [value]);
+      console.debug('CrabZoomer::_setNumber', value);
+      // domUtils.setSelectedOptions(this.numberSelect, [value]);
+      if (value && value.id) {
+        if (value.name) {
+          this._nummerFilteringSelect.set('value', value.name);
+        }
+        else {
+          var huisnummerObj = this._nummerFilteringSelect.store.get(value.id);
+          this._nummerFilteringSelect.set('value', huisnummerObj.name);
+        }
+      }
+      else {
+        this._nummerFilteringSelect.set('value', value);
+      }
+
+
+
+      //   var huisnummerObj = this._nummerFilteringSelect.store.get(this._adresObject.huisnummer_id);
+      //   this._nummerFilteringSelect.set('value', huisnummerObj ? huisnummerObj.label : '');
+      //   this.subadres.value = this._adresObject.subadres ? this._adresObject.subadres : '';
+      // }
+      // else if (this._adresObject && this._adresObject.huisnummer) {
+      //   this._nummerFilteringSelect.set('value', this._adresObject.huisnummer);
+      //   this.subadres.value = this._adresObject.subadres ? this._adresObject.subadres : '';
+      // }
+      // this._nummerFilteringSelect.set('value', value);
       this._numberChange();
     }
   });

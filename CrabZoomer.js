@@ -46,12 +46,12 @@ define([
     postCreate: function () {
       //console.debug('CrabZoomer::postCreate');
       this.inherited(arguments);
+      this._createNumberSelect();
 
       this._fillProvinceSelect(this.provinceList);
       this._fillMunicipalitySelect(this.municipalityList);
       this._fillStreetSelect([]);
       this._fillNumberSelect([]);
-      this._createNumberSelect();
 
       var self = this;
 
@@ -290,7 +290,7 @@ define([
     },
 
     reset: function () {
-      //console.debug('CrabZoomer::reset');
+      console.debug('CrabZoomer::reset');
       this._fillMunicipalitySelect(this.municipalityCache);
       this._fillStreetSelect([]);
       this._fillNumberSelect([]);
@@ -360,7 +360,7 @@ define([
       //console.debug('CrabZoomer::getBbox');
       var bbox = null;
       var url = null;
-      var number = domUtils.getSelectedOption(this.numberSelect);
+      var number = this._nummerFilteringSelect.item ? this._nummerFilteringSelect.item.id : null;
       var street = domUtils.getSelectedOption(this.streetSelect);
       var municipality = domUtils.getSelectedOption(this.municipalitySelect);
 
@@ -422,7 +422,7 @@ define([
 
     _fillNumberSelect: function (nummers) {
       console.debug('CrabZoomer::_fillNumberSelect', nummers);
-      if (nummers && nummers.length > 0) {
+      if (nummers) {
         this._nummerFilteringSelect.set('store', new Memory({data: nummers}));
       }
     },
@@ -448,6 +448,7 @@ define([
     _setNumber: function (value) {
       console.debug('CrabZoomer::_setNumber', value);
       if (!value) {
+        this._nummerFilteringSelect.reset();
         return;
       }
 

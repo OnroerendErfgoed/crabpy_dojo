@@ -116,7 +116,6 @@ define([
       domAttr.remove(this.provinceSelect, "disabled");
       domAttr.remove(this.municipalitySelect, "disabled");
       domAttr.remove(this.streetSelect, "disabled");
-      // domAttr.remove(this.numberSelect, "disabled");
       this._nummerFilteringSelect.set('disabled', false);
     },
 
@@ -126,7 +125,6 @@ define([
       domAttr.set(this.provinceSelect, "disabled", true);
       domAttr.set(this.municipalitySelect, "disabled", true);
       domAttr.set(this.streetSelect, "disabled", true);
-      // domAttr.set(this.numberSelect, "disabled", true);
       this._nummerFilteringSelect.set('disabled', true);
     },
 
@@ -268,7 +266,6 @@ define([
           domAttr.remove(self.provinceSelect, "disabled");
           domAttr.remove(self.municipalitySelect, "disabled");
           domAttr.remove(self.streetSelect, "disabled");
-          // domAttr.remove(self.numberSelect, "disabled");
           self._nummerFilteringSelect.set('disabled', false);
 
           var location = self.value;
@@ -284,7 +281,6 @@ define([
 
     _numberChange: function () {
       //console.debug('CrabZoomer::_numberChange');
-      // var value = domUtils.getSelectedOption(this.numberSelect);
     },
 
     _errorHandler: function (e){
@@ -307,7 +303,6 @@ define([
       domAttr.remove(this.provinceSelect, "disabled");
       domAttr.remove(this.municipalitySelect, "disabled");
       domAttr.set(this.streetSelect, "disabled", true);
-      // domAttr.set(this.numberSelect, "disabled", true);
       this._nummerFilteringSelect.set('disabled', true);
     },
 
@@ -327,12 +322,7 @@ define([
         address.street = this._getSelectValueAsObect(this.streetSelect);
       }
 
-      // if (domUtils.getSelectedOption(this.numberSelect)) {
-      //   address.housenumber = this._getSelectValueAsObect(this.numberSelect);
-      // }
-
       var houseNumberObj = this._nummerFilteringSelect.item;
-      console.debug('CrabZoomer::_getValueAttr::houseNumberObj', houseNumberObj);
       if (houseNumberObj) {
         address.housenumber = {
           id: houseNumberObj.id,
@@ -435,12 +425,6 @@ define([
       if (nummers && nummers.length > 0) {
         this._nummerFilteringSelect.set('store', new Memory({data: nummers}));
       }
-      // domUtils.addSelectOptions(this.numberSelect, {
-      //   data: data,
-      //   idProperty: 'id',
-      //   labelProperty: 'label',
-      //   placeholder: 'Kies een huisnummer'
-      // });
     },
 
     _setProvince: function (value) {
@@ -463,31 +447,17 @@ define([
 
     _setNumber: function (value) {
       console.debug('CrabZoomer::_setNumber', value);
-      // domUtils.setSelectedOptions(this.numberSelect, [value]);
-      if (value && value.id) {
-        if (value.name) {
-          this._nummerFilteringSelect.set('value', value.name);
-        }
-        else {
-          var huisnummerObj = this._nummerFilteringSelect.store.get(value.id);
-          this._nummerFilteringSelect.set('value', huisnummerObj.name);
-        }
-      }
-      else {
-        this._nummerFilteringSelect.set('value', value);
+      if (!value) {
+        return;
       }
 
-
-
-      //   var huisnummerObj = this._nummerFilteringSelect.store.get(this._adresObject.huisnummer_id);
-      //   this._nummerFilteringSelect.set('value', huisnummerObj ? huisnummerObj.label : '');
-      //   this.subadres.value = this._adresObject.subadres ? this._adresObject.subadres : '';
-      // }
-      // else if (this._adresObject && this._adresObject.huisnummer) {
-      //   this._nummerFilteringSelect.set('value', this._adresObject.huisnummer);
-      //   this.subadres.value = this._adresObject.subadres ? this._adresObject.subadres : '';
-      // }
-      // this._nummerFilteringSelect.set('value', value);
+      if (value.id) {
+        var huisnummerObj = this._nummerFilteringSelect.store.get(value.id);
+        this._nummerFilteringSelect.set('item', huisnummerObj);
+      }
+      else if (value.name) {
+        this._nummerFilteringSelect.set('value', value.name);
+      }
       this._numberChange();
     }
   });

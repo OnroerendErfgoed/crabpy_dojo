@@ -3,6 +3,7 @@ define([
   'dojo/_base/array',
   'dojo/request',
   'dojo/dom-attr',
+  'dojo/dom-construct',
   'dojo/store/Memory',
   'dijit/_WidgetBase',
   'dijit/_TemplatedMixin',
@@ -14,6 +15,7 @@ define([
   array,
   request,
   domAttr,
+  domConstruct,
   Memory,
   _WidgetBase,
   _TemplatedMixin,
@@ -38,7 +40,11 @@ define([
     value: null,
     name: null,
     sortMethod: null,
-    gewestList: null,
+    gewestList: [
+      {id: 1, naam: "Brussels Hoofdstedelijk Gewest"},
+      {id: 2, naam: "Vlaams Gewest"},
+      {id: 3, naam: "Waals Gewest"}
+    ],
     provinceList: null,
     municipalityList: null,
     disabled: false,
@@ -50,38 +56,19 @@ define([
       this.inherited(arguments);
       this._createNumberSelect();
 
-      this._fillGewestSelect(this.gewestList);
+      if (this.gewesten) {
+        this._fillGewestSelect(this.gewestList);
+        domAttr.remove(this.gewestSelect, 'disabled');
+      }
+      else {
+        domConstruct.destroy(this.gewestSelect);
+      }
       this._fillProvinceSelect(this.provinceList);
       this._fillMunicipalitySelect(this.municipalityList);
       this._fillStreetSelect([]);
       this._fillNumberSelect([]);
 
       var self = this;
-
-      if (this.gewestList == null) {
-        request(this.baseUrl + "/crab/gewesten", {
-          handleAs: "json",
-          headers: {
-            "X-Requested-With": ""
-          }
-        }).then(
-          function (jsondata) {
-            if (self.sortMethod) {
-              jsondata.sort(self.sortMethod);
-            }
-            self.gewestList = jsondata;
-            self._fillGewestSelect(jsondata);
-            // this._setGewest('');
-            domAttr.remove(self.gewestSelect, "disabled");
-          },
-          function (error) {
-            self._errorHandler(error);
-          }
-        );
-      }
-      else {
-        domAttr.remove(self.gewestSelect, "disabled");
-      }
 
       if (this.provinceList == null) {
         request(this.baseUrl + "/crab/gewesten/2/provincies", {
@@ -467,7 +454,7 @@ define([
     },
 
     _fillGewestSelect: function (data) {
-      //console.debug('CrabZoomer::_fillGewestSelect', data);
+      console.debug('CrabZoomer::_fillGewestSelect', data);
       domUtils.addSelectOptions(this.gewestSelect, {
         data: data,
         idProperty: 'id',
@@ -477,7 +464,7 @@ define([
     },
 
     _fillProvinceSelect: function (data) {
-      //console.debug('CrabZoomer::_fillProvinceSelect', data);
+      console.debug('CrabZoomer::_fillProvinceSelect', data);
       domUtils.addSelectOptions(this.provinceSelect, {
         data: data,
         idProperty: 'niscode',
@@ -487,7 +474,7 @@ define([
     },
 
     _fillMunicipalitySelect: function (data) {
-      //console.debug('CrabZoomer::_fillMunicipalitySelect', data);
+      console.debug('CrabZoomer::_fillMunicipalitySelect', data);
       domUtils.addSelectOptions(this.municipalitySelect, {
         data: data,
         idProperty: 'id',
@@ -497,7 +484,7 @@ define([
     },
 
     _fillStreetSelect: function (data) {
-      //console.debug('CrabZoomer::_fillStreetSelect', data);
+      console.debug('CrabZoomer::_fillStreetSelect', data);
       domUtils.addSelectOptions(this.streetSelect, {
         data: data,
         idProperty: 'id',

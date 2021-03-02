@@ -13,6 +13,7 @@ require([
   // init widget
   var crabpyWidget = new CrabpyWidget({
     name: "location",
+    gewesten: true,
     baseUrl: "https://dev-geo.onroerenderfgoed.be"
     // baseUrl: "http://localhost:6543"
   });

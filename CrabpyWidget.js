@@ -16,6 +16,7 @@ define([
     provinceList: null,
     municipalityList: null,
     baseUrl: null,
+    gewesten: false,
 
     postCreate: function () {
       this.inherited(arguments);
@@ -32,6 +33,7 @@ define([
         name: "crabzoomer",
         baseUrl: this.baseUrl,
         baseClass: this.baseClass,
+        gewesten: this.gewesten,
         sortMethod: this._sortNatural
       }, node);
     },

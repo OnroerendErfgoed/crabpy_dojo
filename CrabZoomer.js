@@ -27,6 +27,7 @@ define([
       '<div data-dojo-attach-point="containerNode" class="widget-pane">' +
       '  <div class="widget-pane-header">Adres</div>' +
       '  <div class="widget-pane-content">' +
+      '    <select data-dojo-attach-point="gewestSelect" data-dojo-attach-event="onchange:_gewestChange" disabled></select>' +
       '    <select data-dojo-attach-point="provinceSelect" data-dojo-attach-event="onchange:_provinceChange" disabled></select>' +
       '    <select data-dojo-attach-point="municipalitySelect" data-dojo-attach-event="onchange:_municipalityChange" disabled></select>' +
       '    <select data-dojo-attach-point="streetSelect" data-dojo-attach-event="onchange:_streetChange" disabled></select>' +
@@ -37,6 +38,7 @@ define([
     value: null,
     name: null,
     sortMethod: null,
+    gewestList: null,
     provinceList: null,
     municipalityList: null,
     disabled: false,
@@ -48,12 +50,38 @@ define([
       this.inherited(arguments);
       this._createNumberSelect();
 
+      this._fillGewestSelect(this.gewestList);
       this._fillProvinceSelect(this.provinceList);
       this._fillMunicipalitySelect(this.municipalityList);
       this._fillStreetSelect([]);
       this._fillNumberSelect([]);
 
       var self = this;
+
+      if (this.gewestList == null) {
+        request(this.baseUrl + "/crab/gewesten", {
+          handleAs: "json",
+          headers: {
+            "X-Requested-With": ""
+          }
+        }).then(
+          function (jsondata) {
+            if (self.sortMethod) {
+              jsondata.sort(self.sortMethod);
+            }
+            self.gewestList = jsondata;
+            self._fillGewestSelect(jsondata);
+            // this._setGewest('');
+            domAttr.remove(self.gewestSelect, "disabled");
+          },
+          function (error) {
+            self._errorHandler(error);
+          }
+        );
+      }
+      else {
+        domAttr.remove(self.gewestSelect, "disabled");
+      }
 
       if (this.provinceList == null) {
         request(this.baseUrl + "/crab/gewesten/2/provincies", {
@@ -139,6 +167,54 @@ define([
         disabled: true,
         'class': 'placeholder-input'
       }, this.numberSelect);
+    },
+
+    _gewestChange: function () {
+      //console.debug('CrabZoomer::_gewestChange');
+      var value = domUtils.getSelectedOption(this.gewestSelect);
+
+      this._setProvince('');
+      this._setMunicipality('');
+      this._setStreet('');
+      this._setNumber('');
+      this.disable();
+
+      if (!value) {
+        this._fillGewestSelect([]);
+        this._fillMunicipalitySelect(this.municipalityCache);
+        this._fillStreetSelect([]);
+        this._fillNumberSelect([]);
+        domAttr.remove(this.provinceSelect, "disabled");
+        domAttr.remove(this.municipalitySelect, "disabled");
+        return false;
+      }
+
+      var self = this;
+
+      request(this.baseUrl + "/crab/gewesten/" + value + "/provincies", {
+        handleAs: "json",
+        headers: {
+          "X-Requested-With": ""
+        }
+      }).then(
+        function (jsondata) {
+          if (self.sortMethod) {
+            jsondata.sort(self.sortMethod);
+          }
+
+          self._fillMunicipalitySelect(jsondata);
+          domAttr.remove(self.provinceSelect, "disabled");
+          domAttr.remove(self.municipalitySelect, "disabled");
+
+          var location = self.value;
+          if (location && location.municipality && location.province && location.province.id == value) {
+            self._setMunicipality(location.municipality.id);
+          }
+        },
+        function (error) {
+          self._errorHandler(error);
+        }
+      );
     },
 
     _provinceChange: function () {
@@ -390,6 +466,16 @@ define([
       return bbox;
     },
 
+    _fillGewestSelect: function (data) {
+      //console.debug('CrabZoomer::_fillGewestSelect', data);
+      domUtils.addSelectOptions(this.gewestSelect, {
+        data: data,
+        idProperty: 'id',
+        labelProperty: 'naam',
+        placeholder: 'Kies een gewest'
+      });
+    },
+
     _fillProvinceSelect: function (data) {
       //console.debug('CrabZoomer::_fillProvinceSelect', data);
       domUtils.addSelectOptions(this.provinceSelect, {
@@ -425,6 +511,12 @@ define([
       if (nummers) {
         this._nummerFilteringSelect.set('store', new Memory({data: nummers}));
       }
+    },
+
+    _setGewest: function (value) {
+      //console.debug('CrabZoomer::_setGewest', value);
+      domUtils.setSelectedOptions(this.gewestSelect, [value]);
+      this._gewestChange();
     },
 
     _setProvince: function (value) {

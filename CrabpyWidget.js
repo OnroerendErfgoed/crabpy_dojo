@@ -13,10 +13,8 @@ define([
   return declare([_WidgetBase], {
 
     baseClass: "crabpyselect",
-    provinceList: null,
-    municipalityList: null,
     baseUrl: null,
-    gewesten: false,
+    alleGewesten: false,
 
     postCreate: function () {
       this.inherited(arguments);
@@ -33,7 +31,7 @@ define([
         name: "crabzoomer",
         baseUrl: this.baseUrl,
         baseClass: this.baseClass,
-        gewesten: this.gewesten,
+        alleGewesten: this.alleGewesten,
         sortMethod: this._sortNatural
       }, node);
     },

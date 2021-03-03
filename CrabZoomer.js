@@ -454,7 +454,7 @@ define([
     },
 
     _setNumber: function (value) {
-      console.debug('CrabZoomer::_setNumber', value);
+      // console.debug('CrabZoomer::_setNumber', value);
       if (!value) {
         this._nummerFilteringSelect.reset();
         return;
@@ -472,7 +472,6 @@ define([
 
     _getGemeentenByGewest: function(gewesten) {
       // console.debug('CrabZoomer::_getGemeentenByGewest', gewesten);
-
       var promises = [];
       array.forEach(gewesten,function(gewest){
         promises.push(this._crabGet('gewesten/' + gewest + '/gemeenten'));
@@ -490,7 +489,7 @@ define([
     },
 
     _crabGet: function(path, sortMethod) {
-      console.debug('CrabZoomer::_crabGet', path);
+      // console.debug('CrabZoomer::_crabGet', path);
       return request(this.baseUrl + '/crab/' + path, {
         handleAs: 'json',
         headers: {

@@ -33,7 +33,6 @@ require([
     label: "Set value",
     onClick: function(){
       crabZoomer.set('value', {"province":{"id":"10000","name":"Antwerpen"},"municipality":{"id":"44","name":"Arendonk"},"street":{"id":"12417","name":"Aartrijtstraat"},"housenumber":{"id":"537126","name":"6"}});
-      // crabZoomer.set('value', {"province":{"id":"10000","name":"Antwerpen"},"municipality":{"id":"44","name":"Arendonk"},"street":{"id":"12417","name":"Aartrijtstraat"},"housenumber":{"name":"66666"}});
 //                    crabZoomer.set('value', {"municipality":{"id":"44","name":"Arendonk"},"street":{"id":"12417","name":"Aartrijtstraat"},"housenumber":{"id":"537126","name":"6"}});
 //                    crabZoomer.set('value', {"province":{"id":"10000","name":"Antwerpen"}});
     }

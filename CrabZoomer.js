@@ -6,11 +6,8 @@ define([
   'dojo/promise/all',
   'dojo/dom-attr',
   'dojo/dom-construct',
-  'dojo/store/Memory',
   'dijit/_WidgetBase',
   'dijit/_TemplatedMixin',
-  'dijit/_WidgetsInTemplateMixin',
-  'dijit/form/ComboBox',
   './utils/DomUtils'
 ], function (
   declare,
@@ -20,14 +17,11 @@ define([
   all,
   domAttr,
   domConstruct,
-  Memory,
   _WidgetBase,
   _TemplatedMixin,
-  _WidgetsInTemplateMixin,
-  ComboBox,
   domUtils
 ) {
-  return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
+  return declare([_WidgetBase, _TemplatedMixin], {
 
     templateString: '' +
       '<div data-dojo-attach-point="containerNode" class="widget-pane">' +
@@ -67,12 +61,10 @@ define([
     disabled: false,
     baseUrl: null,
     alleGewesten: null,
-    _nummerFilteringSelect: null,
 
     postCreate: function () {
       // console.debug('CrabZoomer::postCreate', this.alleGewesten);
       this.inherited(arguments);
-      this._createNumberSelect();
     },
 
     startup: function () {
@@ -115,7 +107,7 @@ define([
       domAttr.remove(this.provinceSelect, 'disabled');
       domAttr.remove(this.municipalitySelect, 'disabled');
       domAttr.remove(this.streetSelect, 'disabled');
-      this._nummerFilteringSelect.set('disabled', false);
+      domAttr.remove(this.numberSelect, 'disabled');
     },
 
     disable: function () {
@@ -127,20 +119,7 @@ define([
       domAttr.set(this.provinceSelect, 'disabled', true);
       domAttr.set(this.municipalitySelect, 'disabled', true);
       domAttr.set(this.streetSelect, 'disabled', true);
-      this._nummerFilteringSelect.set('disabled', true);
-    },
-
-    _createNumberSelect: function() {
-      this._nummerFilteringSelect = new ComboBox({
-        store: new Memory(),
-        hasDownArrow: true,
-        placeHolder: 'Kies een huisnummer',
-        searchAttr: 'label',
-        autoComplete: false,
-        required: false,
-        disabled: true,
-        'class': 'placeholder-input'
-      }, this.numberSelect);
+      domAttr.set(this.numberSelect, 'disabled', true);
     },
 
     _gewestChange: function () {
@@ -283,18 +262,19 @@ define([
           }
           domAttr.remove(this.municipalitySelect, 'disabled');
           domAttr.remove(this.streetSelect, 'disabled');
-          this._nummerFilteringSelect.set('disabled', false);
+          domAttr.remove(this.numberSelect, 'disabled');
 
           var location = this.value;
           if (location && location.housenumber && location.street && location.street.id === value) {
-            this._setNumber(location.housenumber);
+            this._setNumber(location.housenumber.id);
           }
         })
       );
     },
 
     _numberChange: function () {
-      //console.debug('CrabZoomer::_numberChange');
+      var value = domUtils.getSelectedOption(this.numberSelect);
+      //console.debug('CrabZoomer::_numberChange', value);
     },
 
     _errorHandler: function (e){
@@ -316,7 +296,7 @@ define([
       domAttr.remove(this.provinceSelect, 'disabled');
       domAttr.remove(this.municipalitySelect, 'disabled');
       domAttr.set(this.streetSelect, 'disabled', true);
-      this._nummerFilteringSelect.set('disabled', true);
+      domAttr.set(this.numberSelect, 'disabled', true);
     },
 
     _getValueAttr: function () {
@@ -335,15 +315,8 @@ define([
         address.street = this._getSelectValueAsObect(this.streetSelect);
       }
 
-      var houseNumberObj = this._nummerFilteringSelect.item;
-      if (houseNumberObj) {
-        address.housenumber = {
-          id: houseNumberObj.id,
-          name: houseNumberObj.label
-        };
-      }
-      else if (this._nummerFilteringSelect.get('value')) {
-        address.housenumber = {name: this._nummerFilteringSelect.get('value')};
+      if (domUtils.getSelectedOption(this.numberSelect)) {
+        address.housenumber = this._getSelectValueAsObect(this.numberSelect);
       }
 
       return address;
@@ -376,7 +349,7 @@ define([
       //console.debug('CrabZoomer::getBbox');
       var bbox = null;
       var url = null;
-      var number = this._nummerFilteringSelect.item ? this._nummerFilteringSelect.item.id : null;
+      var number = domUtils.getSelectedOption(this.numberSelect);
       var street = domUtils.getSelectedOption(this.streetSelect);
       var municipality = domUtils.getSelectedOption(this.municipalitySelect);
 
@@ -449,12 +422,14 @@ define([
       domUtils.setSelectedOptions(this.streetSelect, ['']);
     },
 
-    _fillNumberSelect: function (nummers) {
-      // console.debug('CrabZoomer::_fillNumberSelect', nummers);
-      if (nummers) {
-        this._nummerFilteringSelect.set('store', new Memory({data: nummers}));
-      }
-      this._nummerFilteringSelect.reset();
+    _fillNumberSelect: function (data) {
+      //console.debug('CrabZoomer::_fillNumberSelect', data);
+      domUtils.addSelectOptions(this.numberSelect, {
+        data: data,
+        idProperty: 'id',
+        labelProperty: 'label',
+        placeholder: 'Kies een huisnummer'
+      });
     },
 
     _setRegion: function (value) {
@@ -482,19 +457,8 @@ define([
     },
 
     _setNumber: function (value) {
-      // console.debug('CrabZoomer::_setNumber', value);
-      if (!value) {
-        this._nummerFilteringSelect.reset();
-        return;
-      }
-
-      if (value.id) {
-        var huisnummerObj = this._nummerFilteringSelect.store.get(value.id);
-        this._nummerFilteringSelect.set('item', huisnummerObj);
-      }
-      else if (value.name) {
-        this._nummerFilteringSelect.set('value', value.name);
-      }
+      //console.debug('CrabZoomer::_setNumber', value);
+      domUtils.setSelectedOptions(this.numberSelect, [value]);
       this._numberChange();
     },
 

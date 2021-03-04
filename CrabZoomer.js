@@ -85,7 +85,7 @@ define([
       }
       else {
         domConstruct.destroy(this.gewestSelect);
-        this.provinceCache = array.filter(this.provinceCache, function(item){
+        this.provinceCache = array.filter(this.provinceCache, function (item){
           return item.gewest.id === 2; // enkel provincies van Vlaams Gewest
         });
       }
@@ -161,7 +161,7 @@ define([
         return false;
       }
 
-      this.provinceList = array.filter(this.provinceCache, function(item){
+      this.provinceList = array.filter(this.provinceCache, function (item){
         return item.gewest.id === parseInt(value);
       });
       this._fillProvinceSelect(this.provinceList);
@@ -498,16 +498,16 @@ define([
       this._numberChange();
     },
 
-    _getGemeentenByGewest: function(gewesten) {
+    _getGemeentenByGewest: function (gewesten) {
       // console.debug('CrabZoomer::_getGemeentenByGewest', gewesten);
       var promises = [];
-      array.forEach(gewesten,function(gewest){
+      array.forEach(gewesten,function (gewest){
         promises.push(this._crabGet('gewesten/' + gewest + '/gemeenten'));
       }, this);
       return all(promises).then(
         lang.hitch(this, function (responses) {
           var gemeenten = [];
-          array.forEach(responses,function(item){
+          array.forEach(responses,function (item){
             gemeenten = gemeenten.concat(item);
           });
           return this.sortMethod ? gemeenten.sort(this.sortMethod) : gemeenten;
@@ -516,7 +516,7 @@ define([
       );
     },
 
-    _crabGet: function(path, sortMethod) {
+    _crabGet: function (path, sortMethod) {
       // console.debug('CrabZoomer::_crabGet', path);
       return request(this.baseUrl + '/crab/' + path, {
         handleAs: 'json',

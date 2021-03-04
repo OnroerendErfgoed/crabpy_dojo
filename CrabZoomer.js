@@ -109,6 +109,9 @@ define([
     enable: function () {
       //console.debug('CrabZoomer::enable');
       this.disabled = false;
+      if (this.alleGewesten) {
+        domAttr.remove(this.gewestSelect, 'disabled');
+      }
       domAttr.remove(this.provinceSelect, 'disabled');
       domAttr.remove(this.municipalitySelect, 'disabled');
       domAttr.remove(this.streetSelect, 'disabled');
@@ -118,6 +121,9 @@ define([
     disable: function () {
       //console.debug('CrabZoomer::disable');
       this.disabled = true;
+      if (this.alleGewesten) {
+        domAttr.set(this.gewestSelect, 'disabled', true);
+      }
       domAttr.set(this.provinceSelect, 'disabled', true);
       domAttr.set(this.municipalitySelect, 'disabled', true);
       domAttr.set(this.streetSelect, 'disabled', true);
@@ -149,6 +155,7 @@ define([
         this.provinceList = this.provinceCache.sort(this.sortMethod);
         this._fillProvinceSelect(this.provinceCache);
         this._fillMunicipalitySelect(this.municipalityCache);
+        domAttr.remove(this.gewestSelect, 'disabled');
         domAttr.remove(this.provinceSelect, 'disabled');
         domAttr.remove(this.municipalitySelect, 'disabled');
         return false;
@@ -158,6 +165,7 @@ define([
         return item.gewest.id === parseInt(value);
       });
       this._fillProvinceSelect(this.provinceList);
+      domAttr.remove(this.gewestSelect, 'disabled');
       if (this.provinceList.length > 0){
         domAttr.remove(this.provinceSelect, 'disabled');
       }
@@ -181,6 +189,9 @@ define([
 
       if (!value) {
         this._fillMunicipalitySelect(this.municipalityCache);
+        if (this.alleGewesten) {
+          domAttr.remove(this.gewestSelect, 'disabled');
+        }
         domAttr.remove(this.provinceSelect, 'disabled');
         domAttr.remove(this.municipalitySelect, 'disabled');
         return false;
@@ -189,6 +200,9 @@ define([
       this._crabGet('provincies/' + value + '/gemeenten', this.sortMethod).then(
         lang.hitch(this, function (jsondata) {
           this._fillMunicipalitySelect(jsondata);
+          if (this.alleGewesten) {
+            domAttr.remove(this.gewestSelect, 'disabled');
+          }
           domAttr.remove(this.provinceSelect, 'disabled');
           domAttr.remove(this.municipalitySelect, 'disabled');
 
@@ -209,6 +223,9 @@ define([
       this._fillNumberSelect([]);      
 
       if (!value) {
+        if (this.alleGewesten) {
+          domAttr.remove(this.gewestSelect, 'disabled');
+        }
         if (this.provinceList.length > 0){
           domAttr.remove(this.provinceSelect, 'disabled');
         }
@@ -219,6 +236,9 @@ define([
       this._crabGet('gemeenten/' + value + '/straten', this.sortMethod).then(
         lang.hitch(this, function (jsondata) {
           this._fillStreetSelect(jsondata);
+          if (this.alleGewesten) {
+            domAttr.remove(this.gewestSelect, 'disabled');
+          }
           if (this.provinceList.length > 0){
             domAttr.remove(this.provinceSelect, 'disabled');
           }
@@ -241,6 +261,9 @@ define([
       this._fillNumberSelect([]); 
 
       if (!value) {
+        if (this.alleGewesten) {
+          domAttr.remove(this.gewestSelect, 'disabled');
+        }
         if (this.provinceList.length > 0){
           domAttr.remove(this.provinceSelect, 'disabled');
         }
@@ -252,6 +275,9 @@ define([
       this._crabGet('straten/' + value + '/huisnummers', this.sortMethod).then(
         lang.hitch(this, function (jsondata) {
           this._fillNumberSelect(jsondata);
+          if (this.alleGewesten) {
+            domAttr.remove(this.gewestSelect, 'disabled');
+          }
           if (this.provinceList.length > 0){
             domAttr.remove(this.provinceSelect, 'disabled');
           }
@@ -286,6 +312,8 @@ define([
       this._fillMunicipalitySelect(this.municipalityCache);
       this._fillStreetSelect([]);
       this._fillNumberSelect([]);
+      domAttr.remove(this.gewestSelect, 'disabled');
+      domAttr.remove(this.provinceSelect, 'disabled');
       domAttr.remove(this.municipalitySelect, 'disabled');
       domAttr.set(this.streetSelect, 'disabled', true);
       this._nummerFilteringSelect.set('disabled', true);
@@ -326,14 +354,14 @@ define([
       return {
         id: domUtils.getSelectedOption(select),
         name: domUtils.getSelectedOptionLabel(select)
-      }
+      };
     },
 
     _setValueAttr: function (location) {
       //console.debug('CrabZoomer::_setValueAttr', location);
       this.value = location;
       if (this.alleGewesten) {
-        this._setGewest('');
+        this._setRegion(location.region ? location.region.id : '');
       }
       if (location.province) {
         this._setProvince(location.province.id);
@@ -429,9 +457,9 @@ define([
       this._nummerFilteringSelect.reset();
     },
 
-    _setGewest: function (value) {
-      //console.debug('CrabZoomer::_setGewest', value);
-      domUtils.setSelectedOptions(this.gewestSelect, [value]);
+    _setRegion: function (value) {
+      // console.debug('CrabZoomer::_setRegion', value);
+      domUtils.setSelectedOptions(this.gewestSelect, [value.toString()]);
       this._gewestChange();
     },
 

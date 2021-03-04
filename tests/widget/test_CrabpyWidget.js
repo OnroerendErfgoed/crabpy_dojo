@@ -120,9 +120,9 @@ require([
   }, "testB6ButtonNode").startup();
 
   new Button({
-    label: "set region",
+    label: 'set region',
     onClick: function(){
       crabZoomer.set('value', {'region': {'id': 2, 'naam': 'Vlaams Gewest'}});
     }
-  }, "test7ButtonNode").startup();
+  }, 'test7ButtonNode').startup();
 });

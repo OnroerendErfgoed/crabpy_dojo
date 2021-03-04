@@ -13,6 +13,7 @@ require([
   // init widget
   var crabpyWidget = new CrabpyWidget({
     name: "location",
+    alleGewesten: true,
     baseUrl: "https://dev-geo.onroerenderfgoed.be"
     // baseUrl: "http://localhost:6543"
   });
@@ -117,4 +118,11 @@ require([
       capakeyZoomer.enable();
     }
   }, "testB6ButtonNode").startup();
+
+  new Button({
+    label: 'set region',
+    onClick: function(){
+      crabZoomer.set('value', {'region': {'id': 2, 'naam': 'Vlaams Gewest'}});
+    }
+  }, 'test7ButtonNode').startup();
 });

@@ -303,6 +303,10 @@ define([
       console.debug('CrabZoomer::_getValueAttr');
       var address = {};
 
+      if (domUtils.getSelectedOption(this.gewestSelect)) {
+        address.regio = this._getSelectValueAsObect(this.gewestSelect);
+      }
+
       if (domUtils.getSelectedOption(this.provinceSelect)) {
         address.province = this._getSelectValueAsObect(this.provinceSelect);
       }

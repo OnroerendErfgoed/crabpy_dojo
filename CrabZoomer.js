@@ -304,7 +304,7 @@ define([
       var address = {};
 
       if (domUtils.getSelectedOption(this.gewestSelect)) {
-        address.regio = this._getSelectValueAsObect(this.gewestSelect);
+        address.region = this._getSelectValueAsObect(this.gewestSelect);
       }
 
       if (domUtils.getSelectedOption(this.provinceSelect)) {

@@ -149,16 +149,14 @@ define([
         domAttr.remove(this.provinceSelect, 'disabled');
       }
 
-      var provinceValue = domUtils.getSelectedOption(this.provinceSelect);
-      if (provinceValue) {
-        this._getGemeentenByGewest(value).then(
-          lang.hitch(this, function (jsondata) {
-            this.municipalityList = jsondata;
-            this._fillMunicipalitySelect(jsondata);
-            domAttr.remove(this.municipalitySelect, 'disabled');
-          })
-        );
-      }
+      this._getGemeentenByGewest(value).then(
+        lang.hitch(this, function (jsondata) {
+          this.municipalityList = jsondata;
+
+          this._fillMunicipalitySelect(jsondata);
+          domAttr.remove(this.municipalitySelect, 'disabled');
+        })
+      );
     },
 
     _provinceChange: function () {
@@ -340,15 +338,19 @@ define([
     _setValueAttr: function (location) {
       //console.debug('CrabZoomer::_setValueAttr', location);
       this.value = location;
+
+      if (location.region.id === '1') {
+        domUtils.setSelectedOptions(this.gewestSelect, ['1']);
+        this._gewestChangeWithNoProvince();
+        this._setMunicipality(location.municipality.id);
+        return;
+      }
+
       if (this.alleGewesten) {
         this._setRegion(location.region ? location.region.id : '');
       }
       if (location.province) {
         this._setProvince(location.province.id);
-      }
-      else if (location.municipality) {
-        this._setMunicipality(location.municipality.id);
-
       }
     },
 
@@ -503,6 +505,33 @@ define([
           this._errorHandler(error);
         })
       );
-    }
+    },
+
+    _gewestChangeWithNoProvince: function () {
+      var value = domUtils.getSelectedOption(this.gewestSelect);
+
+      this.disable();
+      this._fillStreetSelect([]);
+      this._fillNumberSelect([]);
+
+      if (!value) {
+        this.provinceList = this.provinceCache.sort(this.sortMethod);
+        this._fillProvinceSelect(this.provinceCache);
+        this._fillMunicipalitySelect(this.municipalityCache);
+        domAttr.remove(this.gewestSelect, 'disabled');
+        domAttr.remove(this.provinceSelect, 'disabled');
+        domAttr.remove(this.municipalitySelect, 'disabled');
+        return false;
+      }
+
+      this.provinceList = array.filter(this.provinceCache, function (item){
+        return item.gewest.id === parseInt(value);
+      });
+      this._fillProvinceSelect(this.provinceList);
+      domAttr.remove(this.gewestSelect, 'disabled');
+      if (this.provinceList.length > 0){
+        domAttr.remove(this.provinceSelect, 'disabled');
+      }
+    },
   });
 });

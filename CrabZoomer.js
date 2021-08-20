@@ -149,13 +149,16 @@ define([
         domAttr.remove(this.provinceSelect, 'disabled');
       }
 
-      this._getGemeentenByGewest(value).then(
-        lang.hitch(this, function (jsondata) {
-          this.municipalityList = jsondata;
-          this._fillMunicipalitySelect(jsondata);
-          domAttr.remove(this.municipalitySelect, 'disabled');
-        })
-      );
+      var provinceValue = domUtils.getSelectedOption(this.provinceSelect);
+      if (provinceValue) {
+        this._getGemeentenByGewest(value).then(
+          lang.hitch(this, function (jsondata) {
+            this.municipalityList = jsondata;
+            this._fillMunicipalitySelect(jsondata);
+            domAttr.remove(this.municipalitySelect, 'disabled');
+          })
+        );
+      }
     },
 
     _provinceChange: function () {

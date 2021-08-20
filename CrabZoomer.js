@@ -152,7 +152,6 @@ define([
       this._getGemeentenByGewest(value).then(
         lang.hitch(this, function (jsondata) {
           this.municipalityList = jsondata;
-
           this._fillMunicipalitySelect(jsondata);
           domAttr.remove(this.municipalitySelect, 'disabled');
         })
@@ -533,6 +532,6 @@ define([
       if (this.provinceList.length > 0){
         domAttr.remove(this.provinceSelect, 'disabled');
       }
-    },
+    }
   });
 });

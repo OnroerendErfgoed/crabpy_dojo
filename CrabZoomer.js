@@ -339,7 +339,7 @@ define([
       this.value = location;
 
       // Andere logica voor Brussel omdat er legacy code in de _setRegion zit die pas na een call opnieuw gemeentes inlaadt.
-      if (location.region.id === '1') {
+      if (location.region && location.region.id === '1') {
         domUtils.setSelectedOptions(this.gewestSelect, ['1']);
         this._gewestChangeWithNoProvince();
         this._setMunicipality(location.municipality.id);

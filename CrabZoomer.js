@@ -187,7 +187,7 @@ define([
 
           var location = this.value;
           if (location && location.municipality && location.province && location.province.id === value) {
-            this._setMunicipality(location.municipality.niscode);
+            this._setMunicipality(location.municipality.id);
           }
         })
       );

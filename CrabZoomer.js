@@ -187,7 +187,7 @@ define([
 
           var location = this.value;
           if (location && location.municipality && location.province && location.province.id === value) {
-            this._setMunicipality(location.municipality.id);
+            this._setMunicipality(location.municipality.niscode);
           }
         })
       );
@@ -342,7 +342,7 @@ define([
       if (location.region && location.region.id === '1') {
         domUtils.setSelectedOptions(this.gewestSelect, ['1']);
         this._gewestChangeWithNoProvince();
-        this._setMunicipality(location.municipality.id);
+        this._setMunicipality(location.municipality.niscode);
         return;
       }
 
@@ -413,7 +413,7 @@ define([
       // console.debug('CrabZoomer::_fillMunicipalitySelect', data);
       domUtils.addSelectOptions(this.municipalitySelect, {
         data: data,
-        idProperty: 'id',
+        idProperty: 'niscode',
         labelProperty: 'naam',
         placeholder: 'Kies een gemeente'
       });

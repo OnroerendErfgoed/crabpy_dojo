@@ -301,33 +301,33 @@ define([
 
     _getValueAttr: function () {
       console.debug('CrabZoomer::_getValueAttr');
-      var address = {};
+      var adres = {};
 
       if (domUtils.getSelectedOption(this.gewestSelect)) {
         var gewest = this._getSelectValueAsObect(this.gewestSelect);
-        address.gewest = {niscode: gewest.id, naam: gewest.naam};
+        adres.gewest = {niscode: gewest.id, naam: gewest.naam};
       }
 
       if (domUtils.getSelectedOption(this.provinceSelect)) {
         var provincie = this._getSelectValueAsObect(this.provinceSelect);
-        address.provincie = {niscode: provincie.id, naam: provincie.naam};
+        adres.provincie = {niscode: provincie.id, naam: provincie.naam};
       }
 
       if (domUtils.getSelectedOption(this.municipalitySelect)) {
         var gemeente = this._getSelectValueAsObect(this.municipalitySelect);
-        address.gemeente = {niscode: gemeente.id, naam: gemeente.naam};
+        adres.gemeente = {niscode: gemeente.id, naam: gemeente.naam};
       }
 
       if (domUtils.getSelectedOption(this.streetSelect)) {
-        address.straat = this._getSelectValueAsObect(this.streetSelect);
+        adres.straat = this._getSelectValueAsObect(this.streetSelect);
       }
 
       if (domUtils.getSelectedOption(this.numberSelect)) {
         var adresRegister = this._getSelectValueAsObect(this.numberSelect);
-        address.adres = {id: adresRegister.id, huisnummer: adresRegister.naam};
+        adres.adres = {id: adresRegister.id, huisnummer: adresRegister.naam};
       }
 
-      return address;
+      return adres;
     },
 
     _getSelectValueAsObect: function (select) {
@@ -339,7 +339,7 @@ define([
     },
 
     _setValueAttr: function (locatie) {
-      console.debug('CrabZoomer::_setValueAttr', locatie);
+      // console.debug('CrabZoomer::_setValueAttr', locatie);
       this.value = locatie;
 
       // Andere logica voor Brussel omdat er legacy code in de _setRegion zit die pas na een call opnieuw gemeentes inlaadt.
@@ -497,7 +497,7 @@ define([
     },
 
     _crabGet: function (path, sortMethod) {
-      console.debug('CrabZoomer::_crabGet', path);
+      // console.debug('CrabZoomer::_crabGet', path);
       return request(this.baseUrl + '/adressenregister/' + path, {
         handleAs: 'json',
         headers: {

@@ -304,15 +304,18 @@ define([
       var address = {};
 
       if (domUtils.getSelectedOption(this.gewestSelect)) {
-        address.gewest = {niscode: this._getSelectValueAsObect(this.gewestSelect).id, naam: this._getSelectValueAsObect(this.gewestSelect).naam};
+        var gewest = this._getSelectValueAsObect(this.gewestSelect);
+        address.gewest = {niscode: gewest.id, naam: gewest.naam};
       }
 
       if (domUtils.getSelectedOption(this.provinceSelect)) {
-        address.provincie = {niscode: this._getSelectValueAsObect(this.provinceSelect).id, naam: this._getSelectValueAsObect(this.provinceSelect).naam};
+        var provincie = this._getSelectValueAsObect(this.provinceSelect);
+        address.provincie = {niscode: provincie.id, naam: provincie.naam};
       }
 
       if (domUtils.getSelectedOption(this.municipalitySelect)) {
-        address.gemeente = {niscode: this._getSelectValueAsObect(this.municipalitySelect).id, naam: this._getSelectValueAsObect(this.municipalitySelect).naam}
+        var gemeente = this._getSelectValueAsObect(this.municipalitySelect);
+        address.gemeente = {niscode: gemeente.id, naam: gemeente.naam};
       }
 
       if (domUtils.getSelectedOption(this.streetSelect)) {
@@ -320,7 +323,8 @@ define([
       }
 
       if (domUtils.getSelectedOption(this.numberSelect)) {
-        address.adres = {id: this._getSelectValueAsObect(this.numberSelect).id, huisnummer: this._getSelectValueAsObect(this.numberSelect).naam};
+        var adresRegister = this._getSelectValueAsObect(this.numberSelect);
+        address.adres = {id: adresRegister.id, huisnummer: adresRegister.naam};
       }
 
       return address;

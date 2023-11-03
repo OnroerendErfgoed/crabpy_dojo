@@ -145,7 +145,7 @@ define([
       });
       this._fillProvinceSelect(this.provinceList);
       domAttr.remove(this.gewestSelect, 'disabled');
-      if (this.provinceList.length > 0){
+      if (this.provinceList.length > 0) {
         domAttr.remove(this.provinceSelect, 'disabled');
       }
 
@@ -205,7 +205,7 @@ define([
         if (this.alleGewesten) {
           domAttr.remove(this.gewestSelect, 'disabled');
         }
-        if (this.provinceList.length > 0){
+        if (this.provinceList.length > 0) {
           domAttr.remove(this.provinceSelect, 'disabled');
         }
         domAttr.remove(this.municipalitySelect, 'disabled');
@@ -218,7 +218,7 @@ define([
           if (this.alleGewesten) {
             domAttr.remove(this.gewestSelect, 'disabled');
           }
-          if (this.provinceList.length > 0){
+          if (this.provinceList.length > 0) {
             domAttr.remove(this.provinceSelect, 'disabled');
           }
           domAttr.remove(this.municipalitySelect, 'disabled');
@@ -236,19 +236,22 @@ define([
       //console.debug('CrabZoomer::_streetChange');
       var value = domUtils.getSelectedOption(this.streetSelect);
 
-      this.disable();
       this._fillNumberSelect([]);
 
       if (!value) {
         if (this.alleGewesten) {
           domAttr.remove(this.gewestSelect, 'disabled');
         }
-        if (this.provinceList.length > 0){
+        if (this.provinceList.length > 0) {
           domAttr.remove(this.provinceSelect, 'disabled');
         }
         domAttr.remove(this.municipalitySelect, 'disabled');
         domAttr.remove(this.streetSelect, 'disabled');
         return false;
+      }
+
+      if (domUtils.getSelectedOption(this.gewestSelect) !== '2000') {
+        return;
       }
 
       this._crabGet('straten/' + value + '/adressen', this.sortMethod).then(
@@ -257,7 +260,7 @@ define([
           if (this.alleGewesten) {
             domAttr.remove(this.gewestSelect, 'disabled');
           }
-          if (this.provinceList.length > 0){
+          if (this.provinceList.length > 0) {
             domAttr.remove(this.provinceSelect, 'disabled');
           }
           domAttr.remove(this.municipalitySelect, 'disabled');
@@ -437,8 +440,9 @@ define([
 
     _fillNumberSelect: function (data) {
       //console.debug('CrabZoomer::_fillNumberSelect', data);
+      var adressenList = this.makeAdressenUnique(data);
       domUtils.addSelectOptions(this.numberSelect, {
-        data: data,
+        data: adressenList,
         idProperty: 'id',
         labelProperty: 'huisnummer',
         placeholder: 'Kies een huisnummer'
@@ -536,9 +540,20 @@ define([
       });
       this._fillProvinceSelect(this.provinceList);
       domAttr.remove(this.gewestSelect, 'disabled');
-      if (this.provinceList.length > 0){
+      if (this.provinceList.length > 0) {
         domAttr.remove(this.provinceSelect, 'disabled');
       }
+    },
+
+    makeAdressenUnique: function (nonUniqueAdressenArray) {
+      var unique = {};
+      return array.filter(nonUniqueAdressenArray, function(value) {
+        if (!unique[value.huisnummer]) {
+          unique[value.huisnummer] = true;
+          return true;
+        }
+        return false;
+      });
     }
   });
 });

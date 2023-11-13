@@ -39,22 +39,22 @@ define([
     name: null,
     sortMethod: null,
     gewestList: [
-      {id: 1, naam: 'Brussels Hoofdstedelijk Gewest'},
-      {id: 2, naam: 'Vlaams Gewest'},
-      {id: 3, naam: 'Waals Gewest'}
+      {niscode: 4000, naam: 'Brussels Hoofdstedelijk Gewest'},
+      {niscode: 2000, naam: 'Vlaams Gewest'},
+      {niscode: 3000, naam: 'Waals Gewest'}
     ],
     provinceList: null,
     provinceCache: [
-      {niscode: 10000, naam: 'Antwerpen', gewest: {id: 2}},
-      {niscode: 20001, naam: 'Vlaams-Brabant', gewest: {id: 2}},
-      {niscode: 30000, naam: 'West-Vlaanderen', gewest: {id: 2}},
-      {niscode: 40000, naam: 'Oost-Vlaanderen', gewest: {id: 2}},
-      {niscode: 70000, naam: 'Limburg', gewest: {id: 2}},
-      {niscode: 20002, naam: 'Waals-Brabant', gewest: {id: 3}},
-      {niscode: 50000, naam: 'Henegouwen', gewest: {id: 3}},
-      {niscode: 60000, naam: 'Luik', gewest: {id: 3}},
-      {niscode: 80000, naam: 'Luxemburg', gewest: {id: 3}},
-      {niscode: 90000, naam: 'Namen', gewest: {id: 3}}
+      {niscode: 10000, naam: 'Antwerpen', gewest: {niscode: 2000}},
+      {niscode: 20001, naam: 'Vlaams-Brabant', gewest: {niscode: 2000}},
+      {niscode: 30000, naam: 'West-Vlaanderen', gewest: {niscode: 2000}},
+      {niscode: 40000, naam: 'Oost-Vlaanderen', gewest: {niscode: 2000}},
+      {niscode: 70000, naam: 'Limburg', gewest: {niscode: 2000}},
+      {niscode: 20002, naam: 'Waals-Brabant', gewest: {niscode: 3000}},
+      {niscode: 50000, naam: 'Henegouwen', gewest: {niscode: 3000}},
+      {niscode: 60000, naam: 'Luik', gewest: {niscode: 3000}},
+      {niscode: 80000, naam: 'Luxemburg', gewest: {niscode: 3000}},
+      {niscode: 90000, naam: 'Namen', gewest: {niscode: 3000}}
     ],
     municipalityList: null,
     municipalityCache: null,
@@ -78,14 +78,14 @@ define([
       else {
         domConstruct.destroy(this.gewestSelect);
         this.provinceCache = array.filter(this.provinceCache, function (item){
-          return item.gewest.id === 2; // enkel provincies van Vlaams Gewest
+          return item.gewest.niscode === 2000; // enkel provincies van Vlaams Gewest
         });
       }
       this.provinceList = this.provinceCache.sort(this.sortMethod);
       this._fillProvinceSelect(this.provinceList);
       domAttr.remove(this.provinceSelect, 'disabled');
 
-      this._getGemeentenByGewest(this.alleGewesten ? [1, 2, 3] : [2]).then(
+      this._getGemeentenByGewest(this.alleGewesten ? [4000, 2000, 3000] : [2000]).then(
         lang.hitch(this, function (jsondata) {
           this.municipalityCache = jsondata;
           this.municipalityList = jsondata;
@@ -141,11 +141,11 @@ define([
       }
 
       this.provinceList = array.filter(this.provinceCache, function (item){
-        return item.gewest.id === parseInt(value);
+        return item.gewest.niscode === parseInt(value);
       });
       this._fillProvinceSelect(this.provinceList);
       domAttr.remove(this.gewestSelect, 'disabled');
-      if (this.provinceList.length > 0){
+      if (this.provinceList.length > 0) {
         domAttr.remove(this.provinceSelect, 'disabled');
       }
 
@@ -185,9 +185,9 @@ define([
           domAttr.remove(this.provinceSelect, 'disabled');
           domAttr.remove(this.municipalitySelect, 'disabled');
 
-          var location = this.value;
-          if (location && location.municipality && location.province && location.province.id === value) {
-            this._setMunicipality(location.municipality.id);
+          var locatie = this.value;
+          if (locatie && locatie.gemeente && locatie.provincie && locatie.provincie.niscode === value) {
+            this._setMunicipality(locatie.gemeente.niscode);
           }
         })
       );
@@ -199,13 +199,13 @@ define([
 
       this.disable();
       this._fillStreetSelect([]);
-      this._fillNumberSelect([]);      
+      this._fillNumberSelect([]);
 
       if (!value) {
         if (this.alleGewesten) {
           domAttr.remove(this.gewestSelect, 'disabled');
         }
-        if (this.provinceList.length > 0){
+        if (this.provinceList.length > 0) {
           domAttr.remove(this.provinceSelect, 'disabled');
         }
         domAttr.remove(this.municipalitySelect, 'disabled');
@@ -218,15 +218,15 @@ define([
           if (this.alleGewesten) {
             domAttr.remove(this.gewestSelect, 'disabled');
           }
-          if (this.provinceList.length > 0){
+          if (this.provinceList.length > 0) {
             domAttr.remove(this.provinceSelect, 'disabled');
           }
           domAttr.remove(this.municipalitySelect, 'disabled');
           domAttr.remove(this.streetSelect, 'disabled');
 
-          var location = this.value;
-          if (location && location.street && location.municipality && location.municipality.id === value) {
-            this._setStreet(location.street.id);
+          var locatie = this.value;
+          if (locatie && locatie.straat && locatie.gemeente && locatie.gemeente.niscode === value) {
+            this._setStreet(locatie.straat.id);
           }
         })
       );
@@ -236,14 +236,13 @@ define([
       //console.debug('CrabZoomer::_streetChange');
       var value = domUtils.getSelectedOption(this.streetSelect);
 
-      this.disable();
-      this._fillNumberSelect([]); 
+      this._fillNumberSelect([]);
 
       if (!value) {
         if (this.alleGewesten) {
           domAttr.remove(this.gewestSelect, 'disabled');
         }
-        if (this.provinceList.length > 0){
+        if (this.provinceList.length > 0) {
           domAttr.remove(this.provinceSelect, 'disabled');
         }
         domAttr.remove(this.municipalitySelect, 'disabled');
@@ -251,22 +250,26 @@ define([
         return false;
       }
 
-      this._crabGet('straten/' + value + '/huisnummers', this.sortMethod).then(
+      if (domUtils.getSelectedOption(this.gewestSelect) !== '2000') {
+        return;
+      }
+
+      this._crabGet('straten/' + value + '/adressen', this.sortMethod).then(
         lang.hitch(this, function (jsondata) {
           this._fillNumberSelect(jsondata);
           if (this.alleGewesten) {
             domAttr.remove(this.gewestSelect, 'disabled');
           }
-          if (this.provinceList.length > 0){
+          if (this.provinceList.length > 0) {
             domAttr.remove(this.provinceSelect, 'disabled');
           }
           domAttr.remove(this.municipalitySelect, 'disabled');
           domAttr.remove(this.streetSelect, 'disabled');
           domAttr.remove(this.numberSelect, 'disabled');
 
-          var location = this.value;
-          if (location && location.housenumber && location.street && location.street.id === value) {
-            this._setNumber(location.housenumber.id);
+          var locatie = this.value;
+          if (locatie && locatie.adres && locatie.straat && locatie.straat.id === value) {
+            this._setNumber(locatie.adres.id);
           }
         })
       );
@@ -301,56 +304,60 @@ define([
 
     _getValueAttr: function () {
       console.debug('CrabZoomer::_getValueAttr');
-      var address = {};
+      var adres = {};
 
       if (domUtils.getSelectedOption(this.gewestSelect)) {
-        address.region = this._getSelectValueAsObect(this.gewestSelect);
+        var gewest = this._getSelectValueAsObect(this.gewestSelect);
+        adres.gewest = {niscode: gewest.id, naam: gewest.naam};
       }
 
       if (domUtils.getSelectedOption(this.provinceSelect)) {
-        address.province = this._getSelectValueAsObect(this.provinceSelect);
+        var provincie = this._getSelectValueAsObect(this.provinceSelect);
+        adres.provincie = {niscode: provincie.id, naam: provincie.naam};
       }
 
       if (domUtils.getSelectedOption(this.municipalitySelect)) {
-        address.municipality = this._getSelectValueAsObect(this.municipalitySelect);
+        var gemeente = this._getSelectValueAsObect(this.municipalitySelect);
+        adres.gemeente = {niscode: gemeente.id, naam: gemeente.naam};
       }
 
       if (domUtils.getSelectedOption(this.streetSelect)) {
-        address.street = this._getSelectValueAsObect(this.streetSelect);
+        adres.straat = this._getSelectValueAsObect(this.streetSelect);
       }
 
       if (domUtils.getSelectedOption(this.numberSelect)) {
-        address.housenumber = this._getSelectValueAsObect(this.numberSelect);
+        var adresRegister = this._getSelectValueAsObect(this.numberSelect);
+        adres.adres = {id: adresRegister.id, huisnummer: adresRegister.naam};
       }
 
-      return address;
+      return adres;
     },
 
     _getSelectValueAsObect: function (select) {
       //console.debug('CrabZoomer::_getSelectValueAsObect');
       return {
         id: domUtils.getSelectedOption(select),
-        name: domUtils.getSelectedOptionLabel(select)
+        naam: domUtils.getSelectedOptionLabel(select)
       };
     },
 
-    _setValueAttr: function (location) {
-      //console.debug('CrabZoomer::_setValueAttr', location);
-      this.value = location;
+    _setValueAttr: function (locatie) {
+      // console.debug('CrabZoomer::_setValueAttr', locatie);
+      this.value = locatie;
 
       // Andere logica voor Brussel omdat er legacy code in de _setRegion zit die pas na een call opnieuw gemeentes inlaadt.
-      if (location.region && location.region.id === '1') {
-        domUtils.setSelectedOptions(this.gewestSelect, ['1']);
+      if (locatie.gewest && locatie.gewest.niscode === '4000') {
+        domUtils.setSelectedOptions(this.gewestSelect, ['4000']);
         this._gewestChangeWithNoProvince();
-        this._setMunicipality(location.municipality.niscode);
+        this._setMunicipality(locatie.gemeente.niscode);
         return;
       }
 
       if (this.alleGewesten) {
-        this._setRegion(location.region ? location.region.id : '');
+        this._setRegion(locatie.gewest ? locatie.gewest.niscode : '');
       }
-      if (location.province) {
-        this._setProvince(location.province.id);
+      if (locatie.provincie) {
+        this._setProvince(locatie.provincie.niscode);
       }
     },
 
@@ -362,9 +369,9 @@ define([
       var street = domUtils.getSelectedOption(this.streetSelect);
       var municipality = domUtils.getSelectedOption(this.municipalitySelect);
 
-      if (number) {url = this.baseUrl + "/crab/huisnummers/" + number;}
-      else if (street) {url = this.baseUrl + "/crab/straten/" + street;}
-      else if (municipality) {url = this.baseUrl + "/crab/gemeenten/" + municipality;}
+      if (number) {url = this.baseUrl + "/adressenregister/huisnummers/" + number;}
+      else if (street) {url = this.baseUrl + "/adressenregister/straten/" + street;}
+      else if (municipality) {url = this.baseUrl + "/adressenregister/gemeenten/" + municipality;}
 
       if (url) {
         request(url, {
@@ -392,7 +399,7 @@ define([
       // console.debug('CrabZoomer::_fillGewestSelect', data);
       domUtils.addSelectOptions(this.gewestSelect, {
         data: data,
-        idProperty: 'id',
+        idProperty: 'niscode',
         labelProperty: 'naam',
         placeholder: 'Kies een gewest'
       });
@@ -425,7 +432,7 @@ define([
       domUtils.addSelectOptions(this.streetSelect, {
         data: data,
         idProperty: 'id',
-        labelProperty: 'label',
+        labelProperty: 'naam',
         placeholder: 'Kies een straat'
       });
       domUtils.setSelectedOptions(this.streetSelect, ['']);
@@ -433,10 +440,11 @@ define([
 
     _fillNumberSelect: function (data) {
       //console.debug('CrabZoomer::_fillNumberSelect', data);
+      var adressenList = this.makeAdressenUnique(data);
       domUtils.addSelectOptions(this.numberSelect, {
-        data: data,
+        data: adressenList,
         idProperty: 'id',
-        labelProperty: 'label',
+        labelProperty: 'huisnummer',
         placeholder: 'Kies een huisnummer'
       });
     },
@@ -473,6 +481,9 @@ define([
 
     _getGemeentenByGewest: function (gewesten) {
       // console.debug('CrabZoomer::_getGemeentenByGewest', gewesten);
+      if (typeof gewesten === 'string') {
+        gewesten = [gewesten];
+      }
       var promises = [];
       array.forEach(gewesten,function (gewest){
         promises.push(this._crabGet('gewesten/' + gewest + '/gemeenten'));
@@ -491,7 +502,7 @@ define([
 
     _crabGet: function (path, sortMethod) {
       // console.debug('CrabZoomer::_crabGet', path);
-      return request(this.baseUrl + '/crab/' + path, {
+      return request(this.baseUrl + '/adressenregister/' + path, {
         handleAs: 'json',
         headers: {
           'X-Requested-With': '',
@@ -525,13 +536,24 @@ define([
       }
 
       this.provinceList = array.filter(this.provinceCache, function (item){
-        return item.gewest.id === parseInt(value);
+        return item.gewest.niscode === parseInt(value);
       });
       this._fillProvinceSelect(this.provinceList);
       domAttr.remove(this.gewestSelect, 'disabled');
-      if (this.provinceList.length > 0){
+      if (this.provinceList.length > 0) {
         domAttr.remove(this.provinceSelect, 'disabled');
       }
+    },
+
+    makeAdressenUnique: function (nonUniqueAdressenArray) {
+      var unique = {};
+      return array.filter(nonUniqueAdressenArray, function(value) {
+        if (!unique[value.huisnummer]) {
+          unique[value.huisnummer] = true;
+          return true;
+        }
+        return false;
+      });
     }
   });
 });

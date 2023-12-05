@@ -32,9 +32,9 @@ require([
   new Button({
     label: "Set value",
     onClick: function(){
-      crabZoomer.set('value', {"province":{"id":"10000","name":"Antwerpen"},"municipality":{"id":"44","name":"Arendonk"},"street":{"id":"12417","name":"Aartrijtstraat"},"housenumber":{"id":"537126","name":"6"}});
-//                    crabZoomer.set('value', {"municipality":{"id":"44","name":"Arendonk"},"street":{"id":"12417","name":"Aartrijtstraat"},"housenumber":{"id":"537126","name":"6"}});
-//                    crabZoomer.set('value', {"province":{"id":"10000","name":"Antwerpen"}});
+      crabZoomer.set('value', {"provincie":{"niscode":"10000","name":"Antwerpen"},"gemeente":{"niscode":"13001","name":"Arendonk"},"straat":{"id":"12417","name":"Aartrijtstraat"},"adres":{"id":"712126","huisnummer":"6"}});
+//                    crabZoomer.set('value', {"gemeente":{"niscode":"13001","name":"Arendonk"},"straat":{"id":"12417","name":"Aartrijtstraat"},"adres":{"id":"712126","huisnummer":"6"}});
+//                    crabZoomer.set('value', {"provincie":{"id":"10000","name":"Antwerpen"}});
     }
   }, "test2ButtonNode").startup();
 
@@ -121,7 +121,7 @@ require([
   new Button({
     label: 'set region',
     onClick: function(){
-      crabZoomer.set('value', {'region': {'id': 2, 'naam': 'Vlaams Gewest'}});
+      crabZoomer.set('value', {'gewest': {'niscode': 2000, 'naam': 'Vlaams Gewest'}});
     }
   }, 'test7ButtonNode').startup();
 });

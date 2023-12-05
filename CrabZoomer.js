@@ -250,7 +250,8 @@ define([
         return false;
       }
 
-      if (domUtils.getSelectedOption(this.gewestSelect) !== '2000') {
+      var selectedGewest = domUtils.getSelectedOption(this.gewestSelect);
+      if ( selectedGewest && selectedGewest !== '2000') {
         return;
       }
 
@@ -283,7 +284,7 @@ define([
     _errorHandler: function (e){
       console.error("An error occurred in the crabpy dijit: " + e);
       this.reset();
-      alert('Er is een fout opgetreden bij het aanspreken van de CRAB service');
+      alert('Er is een fout opgetreden bij het aanspreken van de Adresregister service');
     },
 
     reset: function () {
@@ -513,7 +514,9 @@ define([
           return sortMethod ? jsondata.sort(sortMethod) : jsondata;
         }),
         lang.hitch(this, function (error) {
-          this._errorHandler(error);
+          if (error.response.status !== 404) {
+            this._errorHandler(error);
+          }
         })
       );
     },

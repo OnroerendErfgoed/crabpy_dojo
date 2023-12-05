@@ -50,7 +50,7 @@ require([
   new Button({
     label: "get bbox",
     onClick: function(){
-      dom.byId("bboxResult").innerHTML = crabZoomer.getBbox();
+      dom.byId("bboxResult").innerHTML = JSON.stringify(crabZoomer.getBbox());
     }
   }, "test4ButtonNode").startup();
 

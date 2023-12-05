@@ -365,34 +365,36 @@ define([
     getBbox: function () {
       //console.debug('CrabZoomer::getBbox');
       var bbox = null;
-      var url = null;
-      var number = domUtils.getSelectedOption(this.numberSelect);
-      var street = domUtils.getSelectedOption(this.streetSelect);
-      var municipality = domUtils.getSelectedOption(this.municipalitySelect);
+      var nummer = domUtils.getSelectedOptionLabel(this.numberSelect);
+      var straat = domUtils.getSelectedOptionLabel(this.streetSelect);
+      var gemeente = domUtils.getSelectedOptionLabel(this.municipalitySelect);
 
-      if (number) {url = this.baseUrl + "/adressenregister/huisnummers/" + number;}
-      else if (street) {url = this.baseUrl + "/adressenregister/straten/" + street;}
-      else if (municipality) {url = this.baseUrl + "/adressenregister/gemeenten/" + municipality;}
-
-      if (url) {
-        request(url, {
-          handleAs: "json",
-          sync: true,
-          headers: {
-            "X-Requested-With": ""
-          }
-        }).then(function (jsondata) {
-            if (jsondata.bounding_box) {
-              bbox = array.map(jsondata.bounding_box, function (item) {
-                return parseFloat(item);
-              });
-            }
-          },
-          function (error) {
-            self._errorHandler(error);
-          });
+      var adres;
+      if (nummer && nummer !== 'Kies een huisnummer') {
+        adres = gemeente + ', ' + straat + ' ' + nummer;
+      }
+      else if (straat && straat !== 'Kies een straat') {
+        adres = gemeente + ', ' + straat;
+      }
+      else if (gemeente && gemeente !== 'Kies een gemeente') {
+        adres = gemeente;
       }
 
+      if (adres) {
+        var url = this.baseUrl + '/geolocation/' + adres;
+        request(url, {
+          handleAs: 'json',
+          sync: true
+        }).then(
+          lang.hitch(this, function (geolocationresponse) {
+            if (geolocationresponse.boundingbox) {
+              bbox = geolocationresponse.boundingbox;
+            }
+          }),
+          lang.hitch(this, function (error) {
+            this._errorHandler(error);
+          }));
+      }
       return bbox;
     },
 

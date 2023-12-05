@@ -250,9 +250,11 @@ define([
         return false;
       }
 
-      var selectedGewest = domUtils.getSelectedOption(this.gewestSelect);
-      if ( selectedGewest && selectedGewest !== '2000') {
-        return;
+      if (this.alleGewesten) {
+        var selectedGewest = domUtils.getSelectedOption(this.gewestSelect);
+        if (selectedGewest && selectedGewest !== '2000') {
+          return;
+        }
       }
 
       this._crabGet('straten/' + value + '/adressen', this.sortMethod).then(

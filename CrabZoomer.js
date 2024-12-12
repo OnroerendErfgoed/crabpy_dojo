@@ -509,6 +509,7 @@ define([
       // console.debug('CrabZoomer::_crabGet', path);
       return request(this.baseUrl + '/adressenregister/' + path, {
         handleAs: 'json',
+        query: 'status=inGebruik',
         headers: {
           'X-Requested-With': '',
           'Accept': 'application/json'
